@@ -5,6 +5,7 @@ import VerifyOTP from "./pages/verify-otp";
 import ResetPassword from "./pages/reset-password";
 import ForgotPassword from "./pages/forgot-password";
 import "./App.css";
+import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
         <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
         <Route
           path="/reset-password/:randomToken"
