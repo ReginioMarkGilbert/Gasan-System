@@ -15,9 +15,9 @@ dotenv.config();
 
 export const signUp = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, address } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !address) {
       return res.status(400).json({
         success: false,
         message: "Please fill in all fields!",
@@ -50,6 +50,7 @@ export const signUp = async (req, res, next) => {
     const newUser = new User({
       name,
       email,
+      address,
       password: hashedPassword,
     });
 
