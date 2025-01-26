@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 
 // Import routes
 import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 dotenv.config();
@@ -46,5 +47,6 @@ app.use((err, req, res, next) => {
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;
