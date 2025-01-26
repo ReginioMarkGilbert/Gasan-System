@@ -14,7 +14,7 @@ export default function LandingPage() {
         if (currentUser) {
             navigate("/dashboard?tab=home");
         } else {
-            navigate("/sign-in");
+            navigate("/");
         }
     }, []);
     return (
