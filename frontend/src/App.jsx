@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {BrowserRouter, Route, Routes, useLocation} from "react-router-dom";
 import SignUp from "./pages/signup";
 import SignIn from "./pages/login";
 import VerifyOTP from "./pages/verify-otp";
@@ -7,8 +7,28 @@ import ForgotPassword from "./pages/forgot-password";
 import "./App.css";
 import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
 import LandingPage from "@/pages/index.jsx";
+import Dashboard from "@/components/dashboard/dashboard.jsx";
+import PrivateRoute from "@/components/private-route.jsx";
+
+const PageNotFound = () => {
+  return (
+      <div>
+        <h1>404 - Page Not Found</h1>
+      </div>
+  );
+};
+
+  const DashboardWrapper = () => {
+  const location = useLocation();
+  const tab = new URLSearchParams(location.search).get("tab");
+
+  const validTabs = ["home", "barangay", "users", "reports"];
+
+  return validTabs.includes(tab) ? <Dashboard tab={tab} /> :<PageNotFound />;
+}
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,6 +42,11 @@ function App() {
           element={<ResetPassword />}
         />
         <Route path="/" element={<LandingPage />} />
+
+        <Route element={<PrivateRoute />}>
+          <Route path="/dashboard" element={<DashboardWrapper />} />
+          <Route path="/dashboard/:tab" element={<DashboardWrapper />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
