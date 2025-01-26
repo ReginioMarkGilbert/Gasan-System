@@ -15,7 +15,7 @@ dotenv.config();
 
 export const signUp = async (req, res, next) => {
   try {
-    const { name, email, password, address } = req.body;
+    const { name, email, password, barangay } = req.body;
 
     if (!name || !email || !password || !address) {
       return res.status(400).json({
@@ -50,7 +50,7 @@ export const signUp = async (req, res, next) => {
     const newUser = new User({
       name,
       email,
-      address,
+      barangay,
       password: hashedPassword,
     });
 

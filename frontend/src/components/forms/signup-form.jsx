@@ -35,7 +35,7 @@ const schema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  address: z.string().min(2, {
+  barangay: z.string().min(2, {
     message: "Address must be at least 2 characters.",
   }),
   email: z.string().email("Invalid email address."),
@@ -54,7 +54,7 @@ export function SignupForm({ className }) {
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
-      address: "",
+      barangay: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -62,16 +62,15 @@ export function SignupForm({ className }) {
   });
 
   const handleRegister = async (values) => {
-    console.log(values);
     try {
-      const { name, address, email, password, confirmPassword } = values;
+      const { name, barangay, email, password, confirmPassword } = values;
 
       if (password !== confirmPassword) {
         toast.error("Passwords do not match.");
         return;
       }
 
-      if (!name || !email || !address || !password || !confirmPassword) {
+      if (!name || !email || !barangay || !password || !confirmPassword) {
         toast.error("All fields are required.");
         return;
       }
@@ -80,7 +79,7 @@ export function SignupForm({ className }) {
 
       const res = await axios.post(`http://localhost:5000/api/auth/signup`, {
         name,
-        address,
+        barangay,
         email,
         password,
       });
@@ -155,7 +154,7 @@ export function SignupForm({ className }) {
           <div className="grid gap-2">
             <FormField
               control={form.control}
-              name="address"
+              name="barangay"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Barangay</FormLabel>

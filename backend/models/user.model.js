@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
+    barangay: {
       type: String,
       required: true,
     },
