@@ -17,7 +17,7 @@ export const signUp = async (req, res, next) => {
   try {
     const { name, email, password, barangay } = req.body;
 
-    if (!name || !email || !password || !address) {
+    if (!name || !email || !password || !barangay) {
       return res.status(400).json({
         success: false,
         message: "Please fill in all fields!",
