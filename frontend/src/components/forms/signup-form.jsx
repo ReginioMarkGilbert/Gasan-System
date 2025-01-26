@@ -1,5 +1,5 @@
 // Third-party libraries
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,10 +23,20 @@ import {
 
 // Utilities
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const schema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
+  }),
+  address: z.string().min(2, {
+    message: "Address must be at least 2 characters.",
   }),
   email: z.string().email("Invalid email address."),
   password: z.string().min(8, {
@@ -37,12 +47,14 @@ const schema = z.object({
 
 export function SignupForm({ className }) {
   const [loading, setLoading] = useState(false);
+  const [barangays, setBarangays] = useState([]);
   const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
+      address: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -50,15 +62,16 @@ export function SignupForm({ className }) {
   });
 
   const handleRegister = async (values) => {
+    console.log(values);
     try {
-      const { name, email, password, confirmPassword } = values;
+      const { name, address, email, password, confirmPassword } = values;
 
       if (password !== confirmPassword) {
         toast.error("Passwords do not match.");
         return;
       }
 
-      if (!name || !email || !password || !confirmPassword) {
+      if (!name || !email || !address || !password || !confirmPassword) {
         toast.error("All fields are required.");
         return;
       }
@@ -67,6 +80,7 @@ export function SignupForm({ className }) {
 
       const res = await axios.post(`http://localhost:5000/api/auth/signup`, {
         name,
+        address,
         email,
         password,
       });
@@ -95,6 +109,19 @@ export function SignupForm({ className }) {
     }
   };
 
+  const fetchBarangays = async () => {
+    try {
+      const res = await axios.get(import.meta.env.VITE_GASAN_BARANGAYS_API_URL);
+      setBarangays(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBarangays();
+  }, []);
+
   return (
     <Form {...form}>
       <form
@@ -119,6 +146,44 @@ export function SignupForm({ className }) {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="John Doe" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid gap-2">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Barangay</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value} // Bind the value
+                      onValueChange={(value) => {
+                        field.onChange(value); // Update the field value in react-hook-form
+                      }}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Barangay" />
+                      </SelectTrigger>
+                      <SelectContent className="w-full">
+                        {barangays && barangays.length > 0 ? (
+                          barangays.map((barangay) => (
+                            <SelectItem
+                              key={barangay.code}
+                              value={barangay.name}
+                            >
+                              {barangay.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <p>No barangays available</p>
+                        )}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
