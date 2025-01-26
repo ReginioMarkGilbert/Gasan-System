@@ -6,6 +6,7 @@ import ResetPassword from "./pages/reset-password";
 import ForgotPassword from "./pages/forgot-password";
 import "./App.css";
 import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
+import LandingPage from "@/pages/index.jsx";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
           path="/reset-password/:randomToken"
           element={<ResetPassword />}
         />
-        <Route path="/" element={<SignIn />} />
+        <Route path="/" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
   );
