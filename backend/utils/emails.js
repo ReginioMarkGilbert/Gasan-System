@@ -1,33 +1,33 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import UserVerification from "../models/user.verification.model.js";
 import nodemailer from "nodemailer";
+import UserVerification from "../models/user.verification.model.js";
 
 export const sendVerificationEmail = async (user, res) => {
-  const userId = user._id;
-  const uniqueString = crypto.randomBytes(15).toString("hex");
-  const hashedString = await bcrypt.hash(uniqueString, 10);
+    const userId = user._id;
+    const uniqueString = crypto.randomBytes(15).toString("hex");
+    const hashedString = await bcrypt.hash(uniqueString, 10);
 
-  const verification = new UserVerification({
-    userId,
-    uniqueString: hashedString,
-    createdAt: new Date(),
-    expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
-  });
+    const verification = new UserVerification({
+        userId,
+        uniqueString: hashedString,
+        createdAt: new Date(),
+        expireAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+    });
 
-  try {
-    // Save the verification record in the database
-    const savedVerification = await verification.save();
+    try {
+        // Save the verification record in the database
+        const savedVerification = await verification.save();
 
-    // Construct the verification URL
-    const url = `http://localhost:5000/api/auth/verify/${uniqueString}/${userId}`;
+        // Construct the verification URL
+        const url = `http://localhost:5000/api/auth/verify/${uniqueString}/${userId}`;
 
-    // Create email options
-    const mailOptions = {
-      from: process.env.AUTH_EMAIL,
-      to: user.email,
-      subject: "Account Verification",
-      html: `
+        // Create email options
+        const mailOptions = {
+            from: process.env.AUTH_EMAIL,
+            to: user.email,
+            subject: "Account Verification",
+            html: `
         <!DOCTYPE html>
           <html>
           <head>
@@ -124,48 +124,44 @@ export const sendVerificationEmail = async (user, res) => {
           </body>
         </html>
       `,
-    };
+        };
 
-    // Create a Nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail", // Use your email provider
-      auth: {
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.AUTH_PASSWORD,
-      },
-    });
+        // Create a Nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            service: "gmail", // Use your email provider
+            auth: {
+                user: process.env.AUTH_EMAIL,
+                pass: process.env.AUTH_PASSWORD,
+            },
+        });
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
+        // Send the email
+        await transporter.sendMail(mailOptions);
 
-    // Respond with success only after email is sent
-    return res
-      .status(201)
-      .json({ message: "Verification email sent successfully." });
-  } catch (error) {
-    console.error("Error sending verification email:", error);
+        // Respond with success only after email is sent
+        return res.status(201).json({ message: "Verification email sent successfully." });
+    } catch (error) {
+        console.error("Error sending verification email:", error);
 
-    // Clean up if saving or email fails
-    try {
-      await UserVerification.deleteOne({ userId, uniqueString: hashedString });
-    } catch (cleanupError) {
-      console.error("Error during cleanup:", cleanupError);
+        // Clean up if saving or email fails
+        try {
+            await UserVerification.deleteOne({ userId, uniqueString: hashedString });
+        } catch (cleanupError) {
+            console.error("Error during cleanup:", cleanupError);
+        }
+
+        // Ensure only one response is sent
+        return res.status(500).json({ message: "Failed to send verification email." });
     }
-
-    // Ensure only one response is sent
-    return res
-      .status(500)
-      .json({ message: "Failed to send verification email." });
-  }
 };
 
 export const sendOTPVerificationEmail = async (user, otp, res, token) => {
-  try {
-    const mailOptions = {
-      from: process.env.AUTH_EMAIL,
-      to: user.email,
-      subject: "Password Reset OTP",
-      html: `
+    try {
+        const mailOptions = {
+            from: process.env.AUTH_EMAIL,
+            to: user.email,
+            subject: "Password Reset OTP",
+            html: `
       <!DOCTYPE html>
         <html>
         <head>
@@ -262,29 +258,25 @@ export const sendOTPVerificationEmail = async (user, otp, res, token) => {
         </body>
       </html>
       `,
-    };
+        };
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.AUTH_PASSWORD,
-      },
-    });
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.AUTH_EMAIL,
+                pass: process.env.AUTH_PASSWORD,
+            },
+        });
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        res
-          .status(500)
-          .json({ message: "An error occured while sending email" });
-      } else {
-        res.status(200).json({ message: "OTP sent successfully", token });
-      }
-    });
-  } catch (error) {
-    console.error("Error sending OTP verification email:", error);
-    return res
-      .status(500)
-      .json({ message: "Failed to send OTP verification email." });
-  }
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                res.status(500).json({ message: "An error occured while sending email" });
+            } else {
+                res.status(200).json({ message: "OTP sent successfully", token });
+            }
+        });
+    } catch (error) {
+        console.error("Error sending OTP verification email:", error);
+        return res.status(500).json({ message: "Failed to send OTP verification email." });
+    }
 };

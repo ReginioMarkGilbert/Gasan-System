@@ -1,6 +1,13 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { MoreHorizontal } from "lucide-react";
 
 const users = [
@@ -8,7 +15,13 @@ const users = [
     { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Inactive" },
     { id: 3, name: "Bob Johnson", email: "bob@example.com", role: "User", status: "Active" },
     { id: 4, name: "Alice Brown", email: "alice@example.com", role: "Manager", status: "Active" },
-    { id: 5, name: "Charlie Davis", email: "charlie@example.com", role: "User", status: "Inactive" },
+    {
+        id: 5,
+        name: "Charlie Davis",
+        email: "charlie@example.com",
+        role: "User",
+        status: "Inactive",
+    },
 ];
 
 export function UserList() {
@@ -30,7 +43,9 @@ export function UserList() {
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.role}</TableCell>
                         <TableCell>
-                            <Badge variant={user.status === "Active" ? "default" : "secondary"}>{user.status}</Badge>
+                            <Badge variant={user.status === "Active" ? "default" : "secondary"}>
+                                {user.status}
+                            </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                             <Button variant="ghost" size="sm">
