@@ -103,6 +103,18 @@ export const login = async (req, res, next) => {
     }
 };
 
+export const logout = async (req, res, next) => {
+    try {
+        res.clearCookie("token");
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const verifyEmail = async (req, res, next) => {
     const { userId, uniqueString } = req.params;
 

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn, getUserFromLocalStorage } from "@/lib/utils";
+import { logout } from "@/redux/user/userSlice";
+import axios from "axios";
 import { motion } from "framer-motion";
 import {
     ChevronRight,
@@ -15,11 +17,25 @@ import {
     Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTrigger,
+} from "../ui/alert-dialog";
 
 export function Sidebar() {
     const location = useLocation();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
     const [user, setUser] = useState(null);
     const currentTab = new URLSearchParams(location.search).get("tab");
 
@@ -86,6 +102,25 @@ export function Sidebar() {
             { icon: User2Icon, label: "Residents", href: "/dashboard?tab=residents" },
         ];
     }
+
+    const handleLogout = async () => {
+        try {
+            setLoggingOut(true);
+            const res = await axios.post("http://localhost:5000/api/auth/logout");
+
+            if (res.status === 200) {
+                dispatch(logout());
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                setLoggingOut(false);
+                navigate("/sign-in");
+                toast.success("Logged out successfully");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred. Please try again later");
+        }
+    };
 
     return (
         <TooltipProvider>
@@ -157,16 +192,60 @@ export function Sidebar() {
                 <div className="p-4 border-t">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                className="w-full justify-start text-white"
-                                onClick={() => console.log("Logout clicked")}
-                            >
-                                <LogOut className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
-                                {!isCollapsed && <span>Logout</span>}
-                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" className="w-full text-white">
+                                        <LogOut className="h-5 w-5" />
+                                        {!isCollapsed && <span>Logout</span>}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        Are you sure you want to logout?
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction>
+                                            <Button
+                                                variant="danger"
+                                                onClick={handleLogout}
+                                                disabled={loggingOut}
+                                            >
+                                                {loggingOut ? "Logging out..." : "Yes, Logout"}
+                                            </Button>
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </TooltipTrigger>
-                        {isCollapsed && <TooltipContent side="right">Logout</TooltipContent>}
+                        {isCollapsed && (
+                            <TooltipContent side="right">
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" className="w-full text-white">
+                                            Logout
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            Are you sure you want to logout?
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction>
+                                                <Button
+                                                    variant="danger"
+                                                    onClick={handleLogout}
+                                                    disabled={loggingOut}
+                                                >
+                                                    {loggingOut ? "Logging out..." : "Yes, Logout"}
+                                                </Button>
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </TooltipContent>
+                        )}
                     </Tooltip>
                 </div>
             </motion.div>
