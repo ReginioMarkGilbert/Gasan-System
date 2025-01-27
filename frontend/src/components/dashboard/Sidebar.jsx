@@ -53,7 +53,7 @@ export function Sidebar() {
       { href: "/dashboard?tab=settings", label: "Settings", icon: Settings },
       { href: "/dashboard?tab=help", label: "Help", icon: HelpCircle },
     ];
-  } else if (user?.role === "captain") {
+  } else if (user?.role === "chairman") {
     sidebarItems = [
       {
         href: "/dashboard?tab=home-captain",
