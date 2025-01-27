@@ -29,7 +29,7 @@ export function Sidebar() {
           <div className="flex items-center justify-between p-4 border-b">
             {!isCollapsed && (
                 <span className="text-2xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-              MyApp
+               BMS
             </span>
             )}
             <Button variant="ghost" size="icon" onClick={() => setIsCollapsed(!isCollapsed)} className="ml-auto">

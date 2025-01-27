@@ -9,14 +9,8 @@ import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
 import LandingPage from "@/pages/index.jsx";
 import Dashboard from "@/components/dashboard/dashboard.jsx";
 import PrivateRoute from "@/components/private-route.jsx";
+import {PageNotFound} from "@/components/common/404.view.jsx";
 
-const PageNotFound = () => {
-  return (
-      <div>
-        <h1>404 - Page Not Found</h1>
-      </div>
-  );
-};
 
   const DashboardWrapper = () => {
   const location = useLocation();
