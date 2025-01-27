@@ -2,6 +2,7 @@ import { Header } from "./Header";
 import Overview from "./Overview"; // Import the Overview component
 import { Sidebar } from "./Sidebar";
 import { UserList } from "./UserList";
+import { Requests } from "@/components/dashboard/Requests.jsx";
 // import Settings from "./Settings"; // Import the Settings component
 // import Help from "./Help"; // Import the Help component
 
@@ -11,6 +12,7 @@ const componentMap = {
     home: Overview, // Map 'home' tab to Overview component
     // settings: Settings,
     // help: Help,
+    requests: Requests,
 };
 
 function Dashboard({ tab }) {
@@ -21,7 +23,7 @@ function Dashboard({ tab }) {
             <Sidebar />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <Header />
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
                     <ComponentToRender />
                 </main>
             </div>
