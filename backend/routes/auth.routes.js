@@ -1,12 +1,12 @@
 import express from "express";
 import {
-  login,
-  resetPassword,
-  sendOTP,
-  signUp,
-  verifiedEmail,
-  verifyEmail,
-  verifyOTP,
+    login,
+    resetPassword,
+    sendOTP,
+    signUp,
+    verifiedEmail,
+    verifyEmail,
+    verifyOTP,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();

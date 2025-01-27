@@ -1,8 +1,5 @@
 import express from "express";
-import {
-  createCaptainAccount,
-  createSecretaryAccount,
-} from "../controllers/admin.controller.js";
+import { createCaptainAccount, createSecretaryAccount } from "../controllers/admin.controller.js";
 
 const router = express.Router();
 

@@ -12,48 +12,45 @@ import SignUp from "./pages/signup";
 import VerifyOTP from "./pages/verify-otp";
 
 const DashboardWrapper = () => {
-  const location = useLocation();
-  const tab = new URLSearchParams(location.search).get("tab") || "overview";
+    const location = useLocation();
+    const tab = new URLSearchParams(location.search).get("tab") || "overview";
 
-  const validTabs = [
-    "overview",
-    "barangay",
-    "users",
-    "reports",
-    "settings",
-    "requests",
-    "request-admin",
-    "incident-report",
-    "incident-report-admin",
-    "residents",
-    "home"
-  ];
+    const validTabs = [
+        "overview",
+        "barangay",
+        "users",
+        "reports",
+        "settings",
+        "requests",
+        "request-admin",
+        "incident-report",
+        "incident-report-admin",
+        "residents",
+        "home",
+    ];
 
-  return validTabs.includes(tab) ? <Dashboard tab={tab} /> : <PageNotFound />;
+    return validTabs.includes(tab) ? <Dashboard tab={tab} /> : <PageNotFound />;
 };
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
-        <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
-        <Route
-          path="/reset-password/:randomToken"
-          element={<ResetPassword />}
-        />
-        <Route path="/" element={<LandingPage />} />
-        <Route path="*" element={<PageNotFound />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
+                <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
+                <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="*" element={<PageNotFound />} />
 
-        <Route element={<PrivateRoute />}>
-          <Route path="/dashboard" element={<DashboardWrapper />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+                <Route element={<PrivateRoute />}>
+                    <Route path="/dashboard" element={<DashboardWrapper />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
