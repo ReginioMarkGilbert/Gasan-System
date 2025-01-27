@@ -22,7 +22,7 @@ const PageNotFound = () => {
   const location = useLocation();
   const tab = new URLSearchParams(location.search).get("tab");
 
-  const validTabs = ["home", "barangay", "users", "reports"];
+  const validTabs = ["home", "barangay", "users", "reports", "settings"];
 
   return validTabs.includes(tab) ? <Dashboard tab={tab} /> :<PageNotFound />;
 }
