@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import barangayClearanceRoutes from "./routes/barangay.clearance.routes.js";
+import barangayIndigencyRoutes from "./routes/barangay.indigency.routes.js";
 
 const app = express();
 dotenv.config();
@@ -50,5 +51,6 @@ app.use((err, req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("api/barangay-clearance", barangayClearanceRoutes);
+app.use("api/barangay-indigency", barangayIndigencyRoutes);
 
 export default app;
