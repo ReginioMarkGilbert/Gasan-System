@@ -47,7 +47,7 @@ export default function Features() {
                     viewport={{ once: true }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">Key Features</h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         Experience the next generation of barangay management with our comprehensive
                         suite of features
