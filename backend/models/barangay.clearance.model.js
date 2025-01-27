@@ -24,7 +24,6 @@ const barangayClearanceSchema = new mongoose.Schema(
         },
         dateOfIssuance: {
             type: Date,
-            required: true,
         },
         isVerified: {
             type: Boolean,
