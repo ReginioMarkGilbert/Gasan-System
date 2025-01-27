@@ -1,19 +1,19 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import SignUp from "./pages/signup";
-import SignIn from "./pages/login";
-import VerifyOTP from "./pages/verify-otp";
-import ResetPassword from "./pages/reset-password";
-import ForgotPassword from "./pages/forgot-password";
-import "./App.css";
-import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
-import LandingPage from "@/pages/index.jsx";
+import { PageNotFound } from "@/components/common/404.view.jsx";
 import Dashboard from "@/components/dashboard/dashboard.jsx";
 import PrivateRoute from "@/components/private-route.jsx";
-import { PageNotFound } from "@/components/common/404.view.jsx";
+import LandingPage from "@/pages/index.jsx";
+import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import "./App.css";
+import ForgotPassword from "./pages/forgot-password";
+import SignIn from "./pages/login";
+import ResetPassword from "./pages/reset-password";
+import SignUp from "./pages/signup";
+import VerifyOTP from "./pages/verify-otp";
 
 const DashboardWrapper = () => {
   const location = useLocation();
-  const tab = new URLSearchParams(location.search).get("tab");
+  const tab = new URLSearchParams(location.search).get("tab") || "overview";
 
   const validTabs = [
     "overview",
@@ -26,6 +26,7 @@ const DashboardWrapper = () => {
     "incident-report",
     "incident-report-admin",
     "residents",
+    "home"
   ];
 
   return validTabs.includes(tab) ? <Dashboard tab={tab} /> : <PageNotFound />;
@@ -45,10 +46,10 @@ function App() {
           element={<ResetPassword />}
         />
         <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<PageNotFound />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<DashboardWrapper />} />
-          <Route path="/dashboard/:tab" element={<DashboardWrapper />} />
         </Route>
       </Routes>
     </BrowserRouter>
