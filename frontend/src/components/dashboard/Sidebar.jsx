@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard?tab=home" },
+  { icon: LayoutDashboard, label: "Overview", href: "/dashboard?tab=overview" },
   { icon: Users, label: "Users", href: "/dashboard?tab=users" },
   { icon: Settings, label: "Settings", href: "/dashboard?tab=settings" },
   { icon: HelpCircle, label: "Help", href: "/dashboard?tab=help" },
@@ -22,7 +22,7 @@ export function Sidebar() {
   return (
       <TooltipProvider>
         <motion.div
-            className={cn("flex flex-col h-screen bg-white border-r shadow-sm", isCollapsed ? "w-16" : "w-64")}
+            className={cn("flex flex-col h-screen bg-green-700 border-r shadow-sm text-white", isCollapsed ? "w-16" : "w-64")}
             animate={{ width: isCollapsed ? "64px" : "256px" }}
             transition={{ duration: 0.3 }}
         >
@@ -46,7 +46,7 @@ export function Sidebar() {
                           <Button
                               asChild
                               variant="ghost"
-                              className={cn("w-full justify-start", currentTab === item.href.split("=")[1] && "bg-gray-100 font-semibold")}
+                              className={cn("w-full justify-start text-white", currentTab === item.href.split("=")[1] && "bg-gray-100 font-semibold text-black")}
                           >
                             <Link to={item.href} className="flex items-center">
                               <item.icon className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
@@ -65,7 +65,7 @@ export function Sidebar() {
           <div className="p-4 border-t">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => console.log("Logout clicked")}>
+                <Button variant="ghost" className="w-full justify-start text-white" onClick={() => console.log("Logout clicked")}>
                   <LogOut className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
                   {!isCollapsed && <span>Logout</span>}
                 </Button>
