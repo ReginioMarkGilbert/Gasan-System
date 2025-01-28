@@ -1,13 +1,14 @@
-import Header from "@/components/common/Header"
-import HeroSection from "@/components/common/HeroSection"
-import Features from "@/components/common/Features"
-import Footer from "@/components/common/Footer"
-import {useSelector} from "react-redux";
-import {useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import Features from "@/components/common/Features";
+import Footer from "@/components/common/Footer";
+import Header from "@/components/common/Header";
+import HeroSection from "@/components/common/HeroSection";
+import Stats from "@/components/common/Stats";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
-    const {currentUser} = useSelector((state) => state.user);
+    const { currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,9 +24,9 @@ export default function LandingPage() {
             <main className="flex-grow">
                 <HeroSection />
                 <Features />
+                <Stats />
             </main>
             <Footer />
         </div>
-    )
+    );
 }
-

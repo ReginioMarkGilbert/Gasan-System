@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn, getUserFromLocalStorage } from "@/lib/utils";
 import { logout } from "@/redux/user/userSlice";
 import axios from "axios";
@@ -27,8 +24,11 @@ import {
     AlertDialogContent,
     AlertDialogFooter,
     AlertDialogHeader,
+    AlertDialogTitle,
     AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { Button } from "../ui/button";
+import { ScrollArea } from "../ui/scroll-area";
 
 export function Sidebar() {
     const location = useLocation();
@@ -61,27 +61,7 @@ export function Sidebar() {
             },
             { icon: HelpCircle, label: "Settings", href: "/dashboard?tab=settings" },
         ];
-    } else if (user?.role === "secretary") {
-        sidebarItems = [
-            {
-                icon: LayoutDashboard,
-                label: "Overview",
-                href: "/dashboard?tab=overview",
-            },
-            { icon: Users, label: "Users", href: "/dashboard?tab=users" },
-            {
-                icon: Mail,
-                label: "Request",
-                href: "/dashboard?tab=request-admin",
-            },
-            {
-                icon: FileText,
-                label: "Incident Report",
-                href: "/dashboard?tab=incident-report-admin",
-            },
-            { icon: User2Icon, label: "Residents", href: "/dashboard?tab=residents" },
-        ];
-    } else if (user?.role === "chairman") {
+    } else if (user?.role === "secretary" || user?.role === "chairman") {
         sidebarItems = [
             {
                 icon: LayoutDashboard,
@@ -123,132 +103,88 @@ export function Sidebar() {
     };
 
     return (
-        <TooltipProvider>
-            <motion.div
-                className={cn(
-                    "flex flex-col h-screen bg-green-700 border-r shadow-sm text-white",
-                    isCollapsed ? "w-16" : "w-64"
+        <motion.div
+            className={cn(
+                "flex flex-col h-screen bg-green-700 border-r shadow-sm text-white",
+                isCollapsed ? "w-16" : "w-64"
+            )}
+            animate={{ width: isCollapsed ? "64px" : "256px" }}
+            transition={{ duration: 0.3 }}
+        >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+                {!isCollapsed && (
+                    <span className="text-2xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                        BMS
+                    </span>
                 )}
-                animate={{ width: isCollapsed ? "64px" : "256px" }}
-                transition={{ duration: 0.3 }}
-            >
-                <div className="flex items-center justify-between p-4 border-b">
-                    {!isCollapsed && (
-                        <span className="text-2xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                            BMS
-                        </span>
-                    )}
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="ml-auto"
-                    >
-                        <Menu className="h-4 w-4" />
-                    </Button>
-                </div>
-                <ScrollArea className="flex-1">
-                    <nav className="p-2">
-                        <ul className="space-y-2">
-                            {sidebarItems.map((item) => (
-                                <li key={item.href}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                asChild
-                                                variant="ghost"
-                                                className={cn(
-                                                    "w-full justify-start text-white",
-                                                    currentTab === item.href.split("=")[1] &&
-                                                        "bg-gray-100 font-semibold text-black"
-                                                )}
-                                            >
-                                                <Link to={item.href} className="flex items-center">
-                                                    <item.icon
-                                                        className={cn(
-                                                            "h-5 w-5",
-                                                            isCollapsed ? "mr-0" : "mr-3"
-                                                        )}
-                                                    />
-                                                    {!isCollapsed && <span>{item.label}</span>}
-                                                    {!isCollapsed &&
-                                                        currentTab === item.href.split("=")[1] && (
-                                                            <ChevronRight className="ml-auto h-4 w-4" />
-                                                        )}
-                                                </Link>
-                                            </Button>
-                                        </TooltipTrigger>
-                                        {isCollapsed && (
-                                            <TooltipContent side="right">
-                                                {item.label}
-                                            </TooltipContent>
-                                        )}
-                                    </Tooltip>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </ScrollArea>
-                <div className="p-4 border-t">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" className="w-full text-white">
-                                        <LogOut className="h-5 w-5" />
-                                        {!isCollapsed && <span>Logout</span>}
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        Are you sure you want to logout?
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction>
-                                            <Button
-                                                variant="danger"
-                                                onClick={handleLogout}
-                                                disabled={loggingOut}
-                                            >
-                                                {loggingOut ? "Logging out..." : "Yes, Logout"}
-                                            </Button>
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </TooltipTrigger>
-                        {isCollapsed && (
-                            <TooltipContent side="right">
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="ghost" className="w-full text-white">
-                                            Logout
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            Are you sure you want to logout?
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                            <AlertDialogAction>
-                                                <Button
-                                                    variant="danger"
-                                                    onClick={handleLogout}
-                                                    disabled={loggingOut}
-                                                >
-                                                    {loggingOut ? "Logging out..." : "Yes, Logout"}
-                                                </Button>
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </TooltipContent>
-                        )}
-                    </Tooltip>
-                </div>
-            </motion.div>
-        </TooltipProvider>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="ml-auto text-white hover:bg-green-600"
+                >
+                    <Menu className="h-4 w-4" />
+                </Button>
+            </div>
+
+            {/* Navigation Items */}
+            <ScrollArea className="flex-1">
+                <nav className="p-2">
+                    <div className="space-y-2">
+                        {sidebarItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                to={item.href}
+                                className={cn(
+                                    "flex items-center w-full py-2 px-3 rounded-lg transition-colors",
+                                    currentTab === item.href.split("=")[1]
+                                        ? "bg-gray-100 text-black font-semibold"
+                                        : "text-white hover:bg-green-600"
+                                )}
+                            >
+                                <item.icon
+                                    className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")}
+                                />
+                                {!isCollapsed && <span>{item.label}</span>}
+                                {!isCollapsed && currentTab === item.href.split("=")[1] && (
+                                    <ChevronRight className="ml-auto h-4 w-4" />
+                                )}
+                            </Link>
+                        ))}
+                    </div>
+                </nav>
+            </ScrollArea>
+
+            {/* Logout Button */}
+            <div className="p-4 border-t">
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            className="w-full text-white hover:bg-green-600 justify-start"
+                        >
+                            <LogOut className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
+                            {!isCollapsed && <span>Logout</span>}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleLogout}
+                                disabled={loggingOut}
+                                className="bg-red-500 hover:bg-red-600"
+                            >
+                                {loggingOut ? "Logging out..." : "Yes, Logout"}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </div>
+        </motion.div>
     );
 }
