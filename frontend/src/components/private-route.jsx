@@ -19,6 +19,8 @@ const PrivateRoute = () => {
             if (decodedToken.exp < currentTime) {
                 dispatch(logout());
                 window.alert("Session expired. Please sign in again.");
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
                 navigate("/sign-in");
             } else {
                 dispatch(loginSuccess(decodedToken));
