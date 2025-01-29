@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { incidentReportSchema } from "./validationSchemas";
@@ -14,6 +14,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import axios from "axios";
+import { toast } from "sonner";
+import { getUserFromLocalStorage } from "@/lib/utils";
 
 const incidentCategories = {
     "Crime-Related Incidents": [
@@ -44,6 +47,21 @@ const incidentCategories = {
 
 export default function IncidentReportForm() {
     const [selectedCategory, setSelectedCategory] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [user, setUser] = useState(() => getUserFromLocalStorage());
+
+    // Update user when localStorage changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            setUser(getUserFromLocalStorage());
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, []);
+
     const {
         register,
         handleSubmit,
@@ -52,14 +70,92 @@ export default function IncidentReportForm() {
         setValue,
     } = useForm({
         resolver: zodResolver(incidentReportSchema),
+        defaultValues: {
+            reporterName: user?.name || "",
+            location: user?.barangay || "",
+        },
     });
 
+    // Update form when user changes
+    useEffect(() => {
+        if (user) {
+            setValue("reporterName", user.name || "");
+            setValue("location", user.barangay || "");
+        }
+    }, [user, setValue]);
+
+    // Use useEffect to handle category changes
+    useEffect(() => {
+        if (selectedCategory) {
+            setValue("category", selectedCategory);
+        }
+    }, [selectedCategory, setValue]);
+
+    const handleCategoryChange = useCallback((value) => {
+        setSelectedCategory(value);
+    }, []);
+
     const onSubmit = async (data) => {
-        console.log("Form data:", data);
-        // Here you would typically send the data to your server
-        // Reset the form after submission
-        reset();
-        setSelectedCategory("");
+        try {
+            setIsSubmitting(true);
+
+            // Convert files to base64
+            const evidenceFiles = [];
+            if (data.evidence?.length) {
+                for (const file of data.evidence) {
+                    const base64Data = await convertFileToBase64(file);
+                    evidenceFiles.push({
+                        filename: file.name,
+                        contentType: file.type,
+                        data: base64Data,
+                    });
+                }
+            }
+
+            // Create request body
+            const requestBody = {
+                ...data,
+                evidence: evidenceFiles,
+            };
+
+            const response = await axios.post(
+                "http://localhost:5000/api/incident-report/submit",
+                requestBody,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            if (response.status === 201) {
+                toast.success("Incident report submitted successfully!");
+                reset();
+                setSelectedCategory("");
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            const errorMessage =
+                error.response?.data?.message ||
+                "Failed to submit incident report. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // Helper function to convert file to base64
+    const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result.split(",")[1];
+                resolve(base64String);
+            };
+            reader.onerror = (error) => reject(error);
+        });
     };
 
     return (
@@ -74,12 +170,7 @@ export default function IncidentReportForm() {
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="category">Incident Category</Label>
-                            <Select
-                                onValueChange={(value) => {
-                                    setSelectedCategory(value);
-                                    setValue("category", value);
-                                }}
-                            >
+                            <Select onValueChange={handleCategoryChange} value={selectedCategory}>
                                 <SelectTrigger id="category">
                                     <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
@@ -137,6 +228,7 @@ export default function IncidentReportForm() {
                                 id="location"
                                 {...register("location")}
                                 placeholder="Enter the incident location"
+                                defaultValue={user?.barangay || ""}
                             />
                             {errors.location && (
                                 <p className="text-red-500 text-sm">{errors.location.message}</p>
@@ -160,6 +252,7 @@ export default function IncidentReportForm() {
                                 id="reporterName"
                                 {...register("reporterName")}
                                 placeholder="Enter your full name"
+                                defaultValue={user?.name || ""}
                             />
                             {errors.reporterName && (
                                 <p className="text-red-500 text-sm">
@@ -202,10 +295,13 @@ export default function IncidentReportForm() {
                                 reset();
                                 setSelectedCategory("");
                             }}
+                            disabled={isSubmitting}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit">Submit Report</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? "Submitting..." : "Submit Report"}
+                        </Button>
                     </div>
                 </form>
             </CardContent>
