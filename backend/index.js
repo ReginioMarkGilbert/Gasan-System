@@ -15,14 +15,7 @@ const app = express();
 dotenv.config();
 
 // Configure CORS before other middleware
-app.use(
-    cors({
-        origin: ["http://localhost:5173"],
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    })
-);
+app.use(cors());
 
 app.use(express.json({ limit: "50mb" })); // Increase payload limit for base64 images
 app.use(cookieParser());
