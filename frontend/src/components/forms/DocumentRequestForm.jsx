@@ -14,11 +14,12 @@ import axios from "axios";
 import { toast } from "sonner";
 import BarangayClearanceForm from "./RequestForm/BarangayClearanceForm";
 import BarangayIndigencyForm from "./RequestForm/BarangayIndigencyForm";
+import CedulaForm from "./RequestForm/CedulaForm";
 
 const documentTypes = [
     "Barangay Clearance",
     "Barangay Indigency",
-    "Sedula",
+    "Cedula",
     "Barangay Business Clearance",
     "Requested Documents",
 ];
@@ -78,6 +79,8 @@ export default function DocumentRequestForm() {
                 return "barangay-clearance";
             case "barangay-indigency":
                 return "barangay-indigency";
+            case "cedula":
+                return "cedula";
             default:
                 return "";
         }
@@ -89,6 +92,8 @@ export default function DocumentRequestForm() {
                 return <BarangayClearanceForm user={user} onSubmit={handleSubmit} />;
             case "Barangay Indigency":
                 return <BarangayIndigencyForm user={user} onSubmit={handleSubmit} />;
+            case "Cedula":
+                return <CedulaForm user={user} onSubmit={handleSubmit} />;
             default:
                 return null;
         }
