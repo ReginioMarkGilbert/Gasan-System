@@ -14,7 +14,7 @@ import {
 import PropTypes from "prop-types";
 import { getUserFromLocalStorage } from "@/lib/utils";
 
-export default function CedulaForm({ onSubmit }) {
+export default function CedulaForm({ onSubmit, initialData, onDataChange }) {
     const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
 
     const {
@@ -22,13 +22,31 @@ export default function CedulaForm({ onSubmit }) {
         handleSubmit,
         formState: { errors },
         setValue,
+        watch,
     } = useForm({
         resolver: zodResolver(cedulaSchema),
         defaultValues: {
             name: currentUser?.name || "",
             barangay: currentUser?.barangay || "",
+            dateOfBirth: initialData?.dateOfBirth || "",
+            placeOfBirth: initialData?.placeOfBirth || "",
+            civilStatus: initialData?.civilStatus || "",
+            occupation: initialData?.occupation || "",
+            employerName: initialData?.employerName || "",
+            employerAddress: initialData?.employerAddress || "",
+            incomeSource: initialData?.incomeSource || "",
+            grossAnnualIncome: initialData?.grossAnnualIncome || "",
+            businessGrossSales: initialData?.businessGrossSales || "",
+            realEstateIncome: initialData?.realEstateIncome || "",
+            validId: initialData?.validId || "",
         },
     });
+
+    // Watch form values and notify parent component of changes
+    const formValues = watch();
+    useEffect(() => {
+        onDataChange?.(formValues);
+    }, [formValues, onDataChange]);
 
     const handleCivilStatusChange = useCallback(
         (value) => {
@@ -237,4 +255,6 @@ export default function CedulaForm({ onSubmit }) {
 
 CedulaForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    initialData: PropTypes.object,
+    onDataChange: PropTypes.func,
 };

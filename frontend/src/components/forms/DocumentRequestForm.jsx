@@ -25,10 +25,35 @@ const documentTypes = [
     "Requested Documents",
 ];
 
+const FORM_STATE_KEY = "documentRequestFormState";
+
 export default function DocumentRequestForm() {
-    const [selectedDocument, setSelectedDocument] = useState("");
+    const [selectedDocument, setSelectedDocument] = useState(() => {
+        const savedState = localStorage.getItem(FORM_STATE_KEY);
+        return savedState ? JSON.parse(savedState).selectedDocument : "";
+    });
+    const [formData, setFormData] = useState(() => {
+        const savedState = localStorage.getItem(FORM_STATE_KEY);
+        return savedState ? JSON.parse(savedState).formData : null;
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [user, setUser] = useState(() => getUserFromLocalStorage());
+
+    // Save form state to localStorage whenever it changes
+    useEffect(() => {
+        if (selectedDocument || formData) {
+            localStorage.setItem(
+                FORM_STATE_KEY,
+                JSON.stringify({
+                    selectedDocument,
+                    formData,
+                })
+            );
+        } else {
+            // Remove from localStorage if both are empty
+            localStorage.removeItem(FORM_STATE_KEY);
+        }
+    }, [selectedDocument, formData]);
 
     // Update user when localStorage changes
     useEffect(() => {
@@ -62,7 +87,10 @@ export default function DocumentRequestForm() {
 
             if (response.status === 201) {
                 toast.success("Document request submitted successfully!");
+                // Clear form state after successful submission
+                localStorage.removeItem(FORM_STATE_KEY);
                 setSelectedDocument("");
+                setFormData(null);
             }
         } catch (error) {
             console.error("Error submitting form:", error);
@@ -71,6 +99,20 @@ export default function DocumentRequestForm() {
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleDocumentChange = (value) => {
+        if (value !== selectedDocument) {
+            setSelectedDocument(value);
+            setFormData(null); // Clear form data when document type changes
+        }
+    };
+
+    const handleFormDataChange = (data) => {
+        // Only update if data has actually changed
+        if (JSON.stringify(data) !== JSON.stringify(formData)) {
+            setFormData(data);
         }
     };
 
@@ -92,13 +134,41 @@ export default function DocumentRequestForm() {
     const renderForm = () => {
         switch (selectedDocument) {
             case "Barangay Clearance":
-                return <BarangayClearanceForm user={user} onSubmit={handleSubmit} />;
+                return (
+                    <BarangayClearanceForm
+                        user={user}
+                        onSubmit={handleSubmit}
+                        initialData={formData}
+                        onDataChange={handleFormDataChange}
+                    />
+                );
             case "Barangay Indigency":
-                return <BarangayIndigencyForm user={user} onSubmit={handleSubmit} />;
+                return (
+                    <BarangayIndigencyForm
+                        user={user}
+                        onSubmit={handleSubmit}
+                        initialData={formData}
+                        onDataChange={handleFormDataChange}
+                    />
+                );
             case "Cedula":
-                return <CedulaForm user={user} onSubmit={handleSubmit} />;
+                return (
+                    <CedulaForm
+                        user={user}
+                        onSubmit={handleSubmit}
+                        initialData={formData}
+                        onDataChange={handleFormDataChange}
+                    />
+                );
             case "Barangay Business Clearance":
-                return <BusinessClearanceForm user={user} onSubmit={handleSubmit} />;
+                return (
+                    <BusinessClearanceForm
+                        user={user}
+                        onSubmit={handleSubmit}
+                        initialData={formData}
+                        onDataChange={handleFormDataChange}
+                    />
+                );
             default:
                 return null;
         }
@@ -115,7 +185,7 @@ export default function DocumentRequestForm() {
                 <div className="space-y-8">
                     <div className="space-y-2">
                         <Label htmlFor="documentType">Document Type</Label>
-                        <Select value={selectedDocument} onValueChange={setSelectedDocument}>
+                        <Select value={selectedDocument} onValueChange={handleDocumentChange}>
                             <SelectTrigger id="documentType">
                                 <SelectValue placeholder="Select document type" />
                             </SelectTrigger>
@@ -135,7 +205,9 @@ export default function DocumentRequestForm() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => {
+                                    localStorage.removeItem(FORM_STATE_KEY);
                                     setSelectedDocument("");
+                                    setFormData(null);
                                 }}
                                 disabled={isSubmitting}
                             >

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import PropTypes from "prop-types";
 import { getUserFromLocalStorage } from "@/lib/utils";
 
-export default function BarangayClearanceForm({ onSubmit }) {
+export default function BarangayClearanceForm({ onSubmit, initialData, onDataChange }) {
     // Get user data directly from localStorage
     const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
 
@@ -16,17 +16,24 @@ export default function BarangayClearanceForm({ onSubmit }) {
         handleSubmit,
         formState: { errors },
         setValue,
+        watch,
     } = useForm({
         resolver: zodResolver(barangayClearanceSchema),
         defaultValues: {
             name: currentUser?.name || "",
             email: currentUser?.email || "",
             barangay: currentUser?.barangay || "",
-            purpose: "",
-            contactNumber: "",
-            dateOfBirth: "",
+            purpose: initialData?.purpose || "",
+            contactNumber: initialData?.contactNumber || "",
+            dateOfBirth: initialData?.dateOfBirth || "",
         },
     });
+
+    // Watch form values and notify parent component of changes
+    const formValues = watch();
+    useEffect(() => {
+        onDataChange?.(formValues);
+    }, [formValues, onDataChange]);
 
     // Update form when localStorage changes
     useEffect(() => {
@@ -124,4 +131,6 @@ export default function BarangayClearanceForm({ onSubmit }) {
 
 BarangayClearanceForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    initialData: PropTypes.object,
+    onDataChange: PropTypes.func,
 };

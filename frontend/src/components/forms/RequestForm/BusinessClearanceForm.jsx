@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessClearanceSchema } from "../validationSchemas";
@@ -14,7 +14,7 @@ import {
 import PropTypes from "prop-types";
 import { getUserFromLocalStorage } from "@/lib/utils";
 
-export default function BusinessClearanceForm({ onSubmit }) {
+export default function BusinessClearanceForm({ onSubmit, initialData, onDataChange }) {
     const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
 
     const {
@@ -22,15 +22,37 @@ export default function BusinessClearanceForm({ onSubmit }) {
         handleSubmit,
         formState: { errors },
         setValue,
+        watch,
     } = useForm({
         resolver: zodResolver(businessClearanceSchema),
         defaultValues: {
             ownerName: currentUser?.name || "",
             email: currentUser?.email || "",
             barangay: currentUser?.barangay || "",
+            businessName: initialData?.businessName || "",
+            businessType: initialData?.businessType || "",
+            businessNature: initialData?.businessNature || "",
+            ownerAddress: initialData?.ownerAddress || "",
+            contactNumber: initialData?.contactNumber || "",
+            dtiSecRegistration: initialData?.dtiSecRegistration || "",
+            mayorsPermit: initialData?.mayorsPermit || "",
+            leaseContract: initialData?.leaseContract || "",
+            barangayClearance: initialData?.barangayClearance || "",
+            fireSafetyCertificate: initialData?.fireSafetyCertificate || "",
+            sanitaryPermit: initialData?.sanitaryPermit || "",
+            validId: initialData?.validId || "",
         },
     });
 
+    // Watch form values and notify parent component of changes
+    const formValues = watch();
+    useEffect(() => {
+        if (formValues) {
+            onDataChange?.(formValues);
+        }
+    }, [formValues, onDataChange]);
+
+    // Update form when localStorage changes
     useEffect(() => {
         const handleStorageChange = () => {
             const userData = getUserFromLocalStorage();
@@ -47,6 +69,23 @@ export default function BusinessClearanceForm({ onSubmit }) {
             window.removeEventListener("storage", handleStorageChange);
         };
     }, [setValue]);
+
+    // Handle business nature selection
+    const handleBusinessNatureChange = useCallback(
+        (value) => {
+            setValue("businessNature", value);
+        },
+        [setValue]
+    );
+
+    // Set initial values when form loads or initialData changes
+    useEffect(() => {
+        if (initialData) {
+            Object.keys(initialData).forEach((key) => {
+                setValue(key, initialData[key]);
+            });
+        }
+    }, [initialData, setValue]);
 
     const handleFormSubmit = (data) => {
         console.log("Submitting business clearance form with data:", data);
@@ -131,7 +170,10 @@ export default function BusinessClearanceForm({ onSubmit }) {
 
                 <div className="space-y-2">
                     <Label htmlFor="businessNature">Nature of Business</Label>
-                    <Select onValueChange={(value) => setValue("businessNature", value)}>
+                    <Select
+                        onValueChange={handleBusinessNatureChange}
+                        defaultValue={initialData?.businessNature}
+                    >
                         <SelectTrigger id="businessNature">
                             <SelectValue placeholder="Select business nature" />
                         </SelectTrigger>
@@ -277,4 +319,6 @@ export default function BusinessClearanceForm({ onSubmit }) {
 
 BusinessClearanceForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    initialData: PropTypes.object,
+    onDataChange: PropTypes.func,
 };
