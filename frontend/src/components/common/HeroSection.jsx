@@ -1,24 +1,20 @@
 import gasanHall from "@/assets/gasan.png";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+    const navigate = useNavigate();
+
     return (
-        <section className="relative bg-gradient-to-br from-green-600 to-green-800 text-white pt-32 pb-24 overflow-hidden">
+        <section className="relative bg-gradient-to-br from-green-600 to-green-800 text-white pt-32 pb-24 overflow-hidden select-text">
             {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
             </div>
 
             <div className="container mx-auto px-4">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-                    <motion.div
-                        className="flex-1 text-center lg:text-left"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
+                    <div className="flex-1 text-center lg:text-left">
                         <h1 className="text-4xl lg:text-7xl font-bold mb-6 leading-tight">
                             Welcome to <br />
                             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -30,29 +26,25 @@ export default function HeroSection() {
                             Experience seamless barangay services at your fingertips.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                            <Button size="lg" className="bg-white text-green-700 hover:bg-green-50">
-                                <Link to="/sign-up" className="flex items-center gap-2">
-                                    Get Started
-                                </Link>
+                            <Button
+                                size="lg"
+                                className="bg-white text-green-700 hover:bg-green-50"
+                                onClick={() => navigate("/get-started")}
+                            >
+                                Get Started
                             </Button>
                             <Button
                                 size="lg"
                                 variant="outline"
                                 className="bg-white text-green-700 hover:bg-green-50"
+                                onClick={() => navigate("/sign-in")}
                             >
-                                <Link to="/about" className="flex items-center gap-2">
-                                    Learn More About Us
-                                </Link>
+                                Sign In
                             </Button>
                         </div>
-                    </motion.div>
+                    </div>
 
-                    <motion.div
-                        className="flex-1"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                    >
+                    <div className="flex-1">
                         <img
                             src={gasanHall}
                             alt="Gasan Municipal Town Hall"
@@ -63,7 +55,7 @@ export default function HeroSection() {
                             className="w-full max-w-2xl mx-auto rounded-lg shadow-2xl"
                             style={{ aspectRatio: "4/3" }}
                         />
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </section>
