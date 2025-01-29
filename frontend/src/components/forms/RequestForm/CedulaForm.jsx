@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cedulaSchema } from "../validationSchemas";
@@ -30,6 +30,13 @@ export default function CedulaForm({ onSubmit }) {
         },
     });
 
+    const handleCivilStatusChange = useCallback(
+        (value) => {
+            setValue("civilStatus", value);
+        },
+        [setValue]
+    );
+
     useEffect(() => {
         const handleStorageChange = () => {
             const userData = getUserFromLocalStorage();
@@ -47,7 +54,7 @@ export default function CedulaForm({ onSubmit }) {
     }, [setValue]);
 
     const handleFormSubmit = (data) => {
-        console.log("Submitting cedula form with data:", data);
+        console.log("CedulaForm - Submitting data:", data);
         onSubmit(data, "cedula");
     };
 
@@ -100,30 +107,10 @@ export default function CedulaForm({ onSubmit }) {
                     )}
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="municipality">Municipality</Label>
-                    <Input
-                        id="municipality"
-                        {...register("municipality")}
-                        placeholder="Enter municipality"
-                    />
-                    {errors.municipality && (
-                        <p className="text-red-500 text-sm">{errors.municipality.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="province">Province</Label>
-                    <Input id="province" {...register("province")} placeholder="Enter province" />
-                    {errors.province && (
-                        <p className="text-red-500 text-sm">{errors.province.message}</p>
-                    )}
-                </div>
-
                 {/* Personal Details */}
                 <div className="space-y-2">
                     <Label htmlFor="civilStatus">Civil Status</Label>
-                    <Select onValueChange={(value) => setValue("civilStatus", value)}>
+                    <Select onValueChange={handleCivilStatusChange}>
                         <SelectTrigger id="civilStatus">
                             <SelectValue placeholder="Select civil status" />
                         </SelectTrigger>
@@ -136,44 +123,6 @@ export default function CedulaForm({ onSubmit }) {
                     </Select>
                     {errors.civilStatus && (
                         <p className="text-red-500 text-sm">{errors.civilStatus.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="citizenship">Citizenship</Label>
-                    <Input
-                        id="citizenship"
-                        {...register("citizenship")}
-                        placeholder="Enter citizenship"
-                    />
-                    {errors.citizenship && (
-                        <p className="text-red-500 text-sm">{errors.citizenship.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="height">Height (cm)</Label>
-                    <Input
-                        id="height"
-                        type="number"
-                        {...register("height")}
-                        placeholder="Enter height"
-                    />
-                    {errors.height && (
-                        <p className="text-red-500 text-sm">{errors.height.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="weight">Weight (kg)</Label>
-                    <Input
-                        id="weight"
-                        type="number"
-                        {...register("weight")}
-                        placeholder="Enter weight"
-                    />
-                    {errors.weight && (
-                        <p className="text-red-500 text-sm">{errors.weight.message}</p>
                     )}
                 </div>
 
