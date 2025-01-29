@@ -11,6 +11,7 @@ import barangayClearanceRoutes from "./routes/barangay.clearance.routes.js";
 import barangayIndigencyRoutes from "./routes/barangay.indigency.routes.js";
 import incidentReportRoutes from "./routes/incident.report.routes.js";
 import cedulaRoutes from "./routes/cedula.routes.js";
+import businessClearanceRoutes from "./routes/business.clearance.routes.js";
 
 const app = express();
 dotenv.config();
@@ -58,5 +59,6 @@ app.use("/api/barangay-clearance", barangayClearanceRoutes);
 app.use("/api/barangay-indigency", barangayIndigencyRoutes);
 app.use("/api/incident-report", incidentReportRoutes);
 app.use("/api/cedula", cedulaRoutes);
+app.use("/api/business-clearance", businessClearanceRoutes);
 
 export default app;
