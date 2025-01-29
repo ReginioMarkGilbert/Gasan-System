@@ -1,3 +1,4 @@
+import gasanHall from "@/assets/gasan.png";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -53,9 +54,14 @@ export default function HeroSection() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                     >
                         <img
-                            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvyF9im71pY_6klXT6we9tVX66Pmwzt0CX1ffJPuk_LbK-8SY0k4eJ4BwxGCFYn2khs8klA2fyzP-wlNMtXo9CqgF76Lf7IwEm-MBK1HnwaZDFZ0h75x52i3RcKJIYOYxZwgDR6xuOz50F/s1600/gasan.png"
+                            src={gasanHall}
                             alt="Gasan Municipal Town Hall"
+                            width={800}
+                            height={600}
+                            loading="eager"
+                            decoding="async"
                             className="w-full max-w-2xl mx-auto rounded-lg shadow-2xl"
+                            style={{ aspectRatio: "4/3" }}
                         />
                     </motion.div>
                 </div>
