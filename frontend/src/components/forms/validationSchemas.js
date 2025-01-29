@@ -10,16 +10,11 @@ export const barangayClearanceSchema = z.object({
 });
 
 export const barangayIndigencySchema = z.object({
-    fullName: z.string().min(1, "Full name is required"),
-    dateOfBirth: z.string().min(1, "Date of birth is required"),
-    address: z.string().min(1, "Address is required"),
+    name: z.string().min(1, "Full name is required"),
+    barangay: z.string().min(1, "Barangay is required"),
     contactNumber: z.string().min(1, "Contact number is required"),
-    income: z.string().min(1, "Income is required"),
-    householdMembers: z.string().min(1, "Number of household members is required"),
+    monthlyIncome: z.string().min(1, "Monthly income is required"),
     purpose: z.string().min(1, "Purpose is required"),
-    supportingDocs: z
-        .instanceof(FileList)
-        .refine((files) => files.length > 0, "Supporting documents are required"),
 });
 
 export const sedulaSchema = z.object({
