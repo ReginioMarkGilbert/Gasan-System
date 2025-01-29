@@ -9,13 +9,23 @@ import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import barangayClearanceRoutes from "./routes/barangay.clearance.routes.js";
 import barangayIndigencyRoutes from "./routes/barangay.indigency.routes.js";
+import incidentReportRoutes from "./routes/incident.report.routes.js";
 
 const app = express();
 dotenv.config();
-app.use(express.json());
 
+// Configure CORS before other middleware
+app.use(
+    cors({
+        origin: ["http://localhost:5173"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true,
+    })
+);
+
+app.use(express.json({ limit: "50mb" })); // Increase payload limit for base64 images
 app.use(cookieParser());
-app.use(cors());
 
 // Run server
 const PORT = process.env.PORT || 5000;
@@ -52,6 +62,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/barangay-clearance", barangayClearanceRoutes);
 app.use("/api/barangay-indigency", barangayIndigencyRoutes);
-
+app.use("/api/incident-report", incidentReportRoutes);
 
 export default app;
