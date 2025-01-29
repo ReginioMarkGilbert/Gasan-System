@@ -78,7 +78,7 @@ export function LoginForm({ className }) {
                 localStorage.setItem("token", data.token);
                 toast.success("Logged in successfully.");
                 setLoading(false);
-                navigate("/dashboard?tab=home");
+                navigate("/dashboard?tab=overview");
             }
         } catch (error) {
             setLoading(false);
@@ -161,7 +161,7 @@ export function LoginForm({ className }) {
                 </Button>
 
                 <div className="text-center text-sm text-gray-600">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link to="/sign-up" className="font-medium text-green-600 hover:text-green-500">
                         Sign up
                     </Link>

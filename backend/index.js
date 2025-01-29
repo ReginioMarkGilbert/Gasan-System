@@ -10,19 +10,14 @@ import authRoutes from "./routes/auth.routes.js";
 import barangayClearanceRoutes from "./routes/barangay.clearance.routes.js";
 import barangayIndigencyRoutes from "./routes/barangay.indigency.routes.js";
 import incidentReportRoutes from "./routes/incident.report.routes.js";
+import cedulaRoutes from "./routes/cedula.routes.js";
+import businessClearanceRoutes from "./routes/business.clearance.routes.js";
 
 const app = express();
 dotenv.config();
 
 // Configure CORS before other middleware
-app.use(
-    cors({
-        origin: ["http://localhost:5173"],
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    })
-);
+app.use(cors());
 
 app.use(express.json({ limit: "50mb" })); // Increase payload limit for base64 images
 app.use(cookieParser());
@@ -63,5 +58,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/barangay-clearance", barangayClearanceRoutes);
 app.use("/api/barangay-indigency", barangayIndigencyRoutes);
 app.use("/api/incident-report", incidentReportRoutes);
+app.use("/api/cedula", cedulaRoutes);
+app.use("/api/business-clearance", businessClearanceRoutes);
 
 export default app;

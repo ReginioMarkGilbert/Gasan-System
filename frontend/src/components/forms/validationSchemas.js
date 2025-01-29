@@ -38,4 +38,44 @@ export const incidentReportSchema = z.object({
     evidence: z.instanceof(FileList).optional(),
 });
 
+export const cedulaSchema = z.object({
+    name: z.string().min(1, "Full name is required"),
+    dateOfBirth: z.string().min(1, "Date of birth is required"),
+    placeOfBirth: z.string().min(1, "Place of birth is required"),
+    barangay: z.string().min(1, "Barangay is required"),
+    civilStatus: z.enum(["Single", "Married", "Widowed", "Separated"], {
+        required_error: "Civil status is required",
+    }),
+    occupation: z.string().min(1, "Occupation is required"),
+    employerName: z.string().optional(),
+    employerAddress: z.string().optional(),
+    incomeSource: z.string().min(1, "Source of income is required"),
+    grossAnnualIncome: z.string().min(1, "Gross annual income is required"),
+    businessGrossSales: z.string().optional(),
+    realEstateIncome: z.string().optional(),
+    validId: z.string().min(1, "Valid ID information is required"),
+});
+
+export const businessClearanceSchema = z.object({
+    ownerName: z.string().min(1, "Business owner's name is required"),
+    businessName: z.string().min(1, "Business name is required"),
+    barangay: z.string().min(1, "Barangay is required"),
+    municipality: z.string().min(1, "Municipality is required"),
+    province: z.string().min(1, "Province is required"),
+    businessType: z.string().min(1, "Type of business is required"),
+    businessNature: z.enum(["Single Proprietorship", "Partnership", "Corporation"], {
+        required_error: "Nature of business is required",
+    }),
+    ownerAddress: z.string().min(1, "Business owner's address is required"),
+    contactNumber: z.string().min(1, "Contact number is required"),
+    email: z.string().email("Invalid email format"),
+    dtiSecRegistration: z.string().min(1, "DTI/SEC registration number is required"),
+    mayorsPermit: z.string().optional(),
+    leaseContract: z.string().optional(),
+    barangayClearance: z.string().min(1, "Barangay clearance is required"),
+    fireSafetyCertificate: z.string().optional(),
+    sanitaryPermit: z.string().optional(),
+    validId: z.string().min(1, "Valid ID information is required"),
+});
+
 // Add more schemas for other document types as needed
