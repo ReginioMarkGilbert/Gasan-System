@@ -14,24 +14,40 @@ export default function HeroSection() {
 
             <div className="container mx-auto px-4">
                 <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-                    <div className="flex-1 text-center lg:text-left">
-                        <h1 className="text-4xl lg:text-7xl font-bold mb-6 leading-tight">
+                    <motion.div
+                        className="flex-1 text-center lg:text-left"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <motion.h1
+                            className="text-4xl lg:text-7xl font-bold mb-6 leading-tight"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                        >
                             Welcome to <br />
                             <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                                 GASAN BMS
                             </span>
-                        </h1>
-                        <p className="text-xl mb-8 text-gray-200 max-w-2xl">
+                        </motion.h1>
+                        <motion.p
+                            className="text-xl mb-8 text-gray-200 max-w-2xl"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.4 }}
+                        >
                             Empowering our community through efficient digital governance.
                             Experience seamless barangay services at your fingertips.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                            <Button
-                                size="lg"
-                                className="bg-white text-green-700 hover:bg-green-50"
-                                onClick={() => navigate("/get-started")}
-                            >
-                                Get Started
+                        </motion.p>
+                        <motion.div
+                            className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.6 }}
+                        >
+                            <Button size="lg" className="bg-white text-green-700 hover:bg-green-50">
+                                <Link to="/get-started">Get Started</Link>
                             </Button>
                             <Button
                                 size="lg"
@@ -41,10 +57,15 @@ export default function HeroSection() {
                             >
                                 Sign In
                             </Button>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
-                    <div className="flex-1">
+                    <motion.div
+                        className="flex-1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                    >
                         <img
                             src={gasanHall}
                             alt="Gasan Municipal Town Hall"

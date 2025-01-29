@@ -39,6 +39,8 @@ function App() {
         <>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/get-started" element={<GetStarted />} />
                     <Route path="/sign-up" element={<SignUp />} />
                     <Route path="/sign-in" element={<SignIn />} />
                     <Route path="/get-started" element={<GetStarted />} />
@@ -46,7 +48,6 @@ function App() {
                     <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
                     <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
                     <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
-                    <Route path="/" element={<LandingPage />} />
                     <Route path="*" element={<PageNotFound />} />
 
                     <Route element={<PrivateRoute />}>

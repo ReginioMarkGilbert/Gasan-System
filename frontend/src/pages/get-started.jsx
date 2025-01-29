@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, FileText, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function GetStarted() {
+    const navigate = useNavigate();
     const steps = [
         {
             icon: <Users className="h-6 w-6" />,
@@ -50,55 +50,35 @@ export default function GetStarted() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 {/* Hero Section */}
                 <div className="text-center mb-16">
-                    <motion.h1
-                        className="text-4xl font-bold text-gray-900 mb-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
                         Get Started with GASAN BMS
-                    </motion.h1>
-                    <motion.p
-                        className="text-xl text-gray-600 mb-8"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 }}
-                    >
+                    </h1>
+                    <p className="text-xl text-gray-600 mb-8">
                         Follow these simple steps to start using our barangay management system
-                    </motion.p>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                    >
+                    </p>
+                    <div>
                         <Button
-                            asChild
                             size="lg"
                             className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => navigate("/sign-up")}
                         >
-                            <Link to="/sign-up" className="flex items-center gap-2">
+                            <span className="flex items-center gap-2">
                                 Create Account <ArrowRight className="h-4 w-4" />
-                            </Link>
+                            </span>
                         </Button>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Steps */}
                 <div className="grid md:grid-cols-3 gap-8 mb-16">
                     {steps.map((step, index) => (
-                        <motion.div
-                            key={index}
-                            className="bg-white rounded-lg shadow-lg p-6"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 * (index + 3) }}
-                        >
+                        <div key={index} className="bg-white rounded-lg shadow-lg p-6">
                             <div className="text-green-600 mb-4">{step.icon}</div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
                                 {step.title}
                             </h3>
                             <p className="text-gray-600">{step.description}</p>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
 
@@ -156,14 +136,14 @@ export default function GetStarted() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Button
-                            asChild
                             size="lg"
                             className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => navigate("/sign-up")}
                         >
-                            <Link to="/sign-up">Create Account</Link>
+                            Create Account
                         </Button>
-                        <Button asChild size="lg" variant="outline">
-                            <Link to="/about">Learn More</Link>
+                        <Button size="lg" variant="outline" onClick={() => navigate("/about")}>
+                            Learn More
                         </Button>
                     </div>
                 </div>
