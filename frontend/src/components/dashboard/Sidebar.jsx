@@ -57,7 +57,7 @@ export function Sidebar() {
             {
                 icon: FileText,
                 label: "Incident reports",
-                href: "/dashboard?tab=incident-reports",
+                href: "/dashboard?tab=reports",
             },
             { icon: HelpCircle, label: "Settings", href: "/dashboard?tab=settings" },
         ];
