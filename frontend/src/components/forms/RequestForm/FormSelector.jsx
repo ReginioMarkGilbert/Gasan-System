@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -9,11 +9,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import BarangayClearanceForm from "./BarangayClearanceForm";
+import IncidentReportForm from "./IncidentReportForm";
+import BarangayIndigencyForm from "./BarangayIndigencyForm";
+import PropTypes from "prop-types";
 import axios from "axios";
 import { toast } from "sonner";
-import BarangayClearanceForm from "./RequestForm/BarangayClearanceForm";
-import BarangayIndigencyForm from "./RequestForm/BarangayIndigencyForm";
 
 const documentTypes = [
     "Barangay Clearance",
@@ -23,29 +24,14 @@ const documentTypes = [
     "Requested Documents",
 ];
 
-export default function DocumentRequestForm() {
+export default function FormSelector({ user }) {
     const [selectedDocument, setSelectedDocument] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [user, setUser] = useState(() => getUserFromLocalStorage());
-
-    // Update user when localStorage changes
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setUser(getUserFromLocalStorage());
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
 
     const handleSubmit = async (data, formType) => {
         try {
             setIsSubmitting(true);
             const endpoint = getEndpointForFormType(formType);
-
-            console.log(`Submitting to: /api/${endpoint}/request`, data);
 
             const response = await axios.post(
                 `http://localhost:5000/api/${endpoint}/request`,
@@ -53,7 +39,6 @@ export default function DocumentRequestForm() {
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        "Content-Type": "application/json",
                     },
                 }
             );
@@ -78,6 +63,8 @@ export default function DocumentRequestForm() {
                 return "barangay-clearance";
             case "barangay-indigency":
                 return "barangay-indigency";
+            case "incident-report":
+                return "incident-report";
             default:
                 return "";
         }
@@ -89,6 +76,8 @@ export default function DocumentRequestForm() {
                 return <BarangayClearanceForm user={user} onSubmit={handleSubmit} />;
             case "Barangay Indigency":
                 return <BarangayIndigencyForm user={user} onSubmit={handleSubmit} />;
+            case "Incidents Report":
+                return <IncidentReportForm user={user} onSubmit={handleSubmit} />;
             default:
                 return null;
         }
@@ -124,9 +113,7 @@ export default function DocumentRequestForm() {
                             <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => {
-                                    setSelectedDocument("");
-                                }}
+                                onClick={() => setSelectedDocument("")}
                                 disabled={isSubmitting}
                             >
                                 Cancel
@@ -141,3 +128,11 @@ export default function DocumentRequestForm() {
         </Card>
     );
 }
+
+FormSelector.propTypes = {
+    user: PropTypes.shape({
+        name: PropTypes.string,
+        email: PropTypes.string,
+        barangay: PropTypes.string,
+    }),
+};

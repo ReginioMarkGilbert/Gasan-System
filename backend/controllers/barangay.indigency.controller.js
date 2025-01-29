@@ -2,13 +2,21 @@ import BarangayIndigency from "../models/barangay.indigency.model.js";
 
 export const createBarangayIndigency = async (req, res, next) => {
     try {
-        const { name, address, contactNumber, monthlyIncome, purpose } = req.body;
+        const { name, barangay, contactNumber, monthlyIncome, purpose } = req.body;
+
+        // Validate required fields
+        if (!name || !barangay || !contactNumber || !monthlyIncome || !purpose) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide all required fields",
+            });
+        }
 
         const barangayIndigency = new BarangayIndigency({
             name,
-            address,
+            barangay,
             contactNumber,
-            monthlyIncome,
+            monthlyIncome: parseFloat(monthlyIncome),
             purpose,
         });
 
@@ -16,6 +24,7 @@ export const createBarangayIndigency = async (req, res, next) => {
 
         res.status(201).json({
             success: true,
+            message: "Barangay Indigency request submitted successfully",
             data: barangayIndigency,
         });
     } catch (error) {
