@@ -3,6 +3,7 @@ import Overview from "./Overview"; // Import the Overview component
 import { Sidebar } from "./Sidebar";
 import { UserList } from "./UserList";
 import { Requests } from "@/components/dashboard/Requests.jsx";
+import IncidentReportsPage from "@/pages/IncidentReportsPage";
 // import Settings from "./Settings"; // Import the Settings component
 // import Help from "./Help"; // Import the Help component
 
@@ -13,6 +14,7 @@ const componentMap = {
     // settings: Settings,
     // help: Help,
     requests: Requests,
+    reports: IncidentReportsPage,
 };
 
 function Dashboard({ tab }) {

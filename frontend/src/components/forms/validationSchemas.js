@@ -31,4 +31,16 @@ export const sedulaSchema = z.object({
     grossAnnualIncome: z.string().min(1, "Gross annual income is required"),
 });
 
+export const incidentReportSchema = z.object({
+    category: z.string().min(1, "Category is required"),
+    subCategory: z.string().min(1, "Sub-category is required"),
+    date: z.string().min(1, "Date is required"),
+    time: z.string().min(1, "Time is required"),
+    location: z.string().min(1, "Location is required"),
+    description: z.string().min(10, "Description must be at least 10 characters long"),
+    reporterName: z.string().min(1, "Your name is required"),
+    reporterContact: z.string().min(1, "Contact information is required"),
+    evidence: z.instanceof(FileList).optional(),
+});
+
 // Add more schemas for other document types as needed
