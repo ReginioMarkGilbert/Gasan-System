@@ -37,9 +37,9 @@ export default function HeroSection() {
                                 size="lg"
                                 variant="outline"
                                 className="bg-white text-green-700 hover:bg-green-50"
-                                onClick={() => navigate("/sign-in")}
+                                onClick={() => navigate("/about")}
                             >
-                                Sign In
+                                Learn More About Us
                             </Button>
                         </div>
                     </div>
