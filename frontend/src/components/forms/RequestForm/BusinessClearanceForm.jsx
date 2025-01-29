@@ -192,7 +192,7 @@ export default function BusinessClearanceForm({ onSubmit, initialData, onDataCha
 
                 {/* Contact Information */}
                 <div className="space-y-2">
-                    <Label htmlFor="ownerAddress">Business Owner's Address</Label>
+                    <Label htmlFor="ownerAddress">Business Owner&apos;s Address</Label>
                     <Input
                         id="ownerAddress"
                         {...register("ownerAddress")}
@@ -242,7 +242,7 @@ export default function BusinessClearanceForm({ onSubmit, initialData, onDataCha
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="mayorsPermit">Mayor's Permit (if renewing)</Label>
+                    <Label htmlFor="mayorsPermit">Mayor&apos;s Permit (if renewing)</Label>
                     <Input
                         id="mayorsPermit"
                         {...register("mayorsPermit")}
