@@ -1,7 +1,6 @@
 import { PageNotFound } from "@/components/common/404.view.jsx";
 import Dashboard from "@/components/dashboard/dashboard.jsx";
 import PrivateRoute from "@/components/private-route.jsx";
-import About from "@/pages/about.jsx";
 import LandingPage from "@/pages/index.jsx";
 import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
@@ -40,15 +39,14 @@ function App() {
         <>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/get-started" element={<GetStarted />} />
-                    <Route path="/about" element={<About />} />
                     <Route path="/sign-up" element={<SignUp />} />
                     <Route path="/sign-in" element={<SignIn />} />
+                    <Route path="/get-started" element={<GetStarted />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
                     <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
                     <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="*" element={<PageNotFound />} />
 
                     <Route element={<PrivateRoute />}>
