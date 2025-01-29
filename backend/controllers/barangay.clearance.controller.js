@@ -4,19 +4,27 @@ export const createBarangayClearance = async (req, res, next) => {
     try {
         const { name, email, barangay, purpose, contactNumber } = req.body;
 
+        // Validate required fields
+        if (!name || !email || !barangay || !purpose || !contactNumber) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide all required fields",
+            });
+        }
+
         const barangayClearance = new BarangayClearance({
             name,
             email,
             barangay,
             purpose,
             contactNumber,
-            dateOfIssuance: new Date(),
         });
 
         await barangayClearance.save();
 
         res.status(201).json({
             success: true,
+            message: "Barangay clearance request created successfully",
             data: barangayClearance,
         });
     } catch (error) {

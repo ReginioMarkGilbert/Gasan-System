@@ -67,7 +67,7 @@ export function LoginForm({ className }) {
                     _id: data._id,
                     name: data.name,
                     email: data.email,
-                    address: data.address,
+                    barangay: data.barangay,
                     isVerified: data.isVerified,
                     role: data.role,
                     createdAt: data.createdAt,

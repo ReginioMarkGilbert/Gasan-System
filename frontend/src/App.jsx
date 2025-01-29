@@ -10,6 +10,7 @@ import SignIn from "./pages/login";
 import ResetPassword from "./pages/reset-password";
 import SignUp from "./pages/signup";
 import VerifyOTP from "./pages/verify-otp";
+import { Toaster } from "sonner";
 
 const DashboardWrapper = () => {
     const location = useLocation();
@@ -34,22 +35,25 @@ const DashboardWrapper = () => {
 
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/sign-up" element={<SignUp />} />
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
-                <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
-                <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
-                <Route path="/" element={<LandingPage />} />
-                <Route path="*" element={<PageNotFound />} />
+        <>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/sign-up" element={<SignUp />} />
+                    <Route path="/sign-in" element={<SignIn />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
+                    <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
+                    <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="*" element={<PageNotFound />} />
 
-                <Route element={<PrivateRoute />}>
-                    <Route path="/dashboard" element={<DashboardWrapper />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
+                    <Route element={<PrivateRoute />}>
+                        <Route path="/dashboard" element={<DashboardWrapper />} />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+            <Toaster position="top-center" richColors />
+        </>
     );
 }
 

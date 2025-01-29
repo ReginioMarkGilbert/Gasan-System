@@ -50,7 +50,8 @@ app.use((err, req, res, next) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("api/barangay-clearance", barangayClearanceRoutes);
-app.use("api/barangay-indigency", barangayIndigencyRoutes);
+app.use("/api/barangay-clearance", barangayClearanceRoutes);
+app.use("/api/barangay-indigency", barangayIndigencyRoutes);
+
 
 export default app;

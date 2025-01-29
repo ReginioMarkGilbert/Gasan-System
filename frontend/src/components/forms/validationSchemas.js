@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const barangayClearanceSchema = z.object({
-    fullName: z.string().min(1, "Full name is required"),
-    dateOfBirth: z.string().min(1, "Date of birth is required"),
-    address: z.string().min(1, "Address is required"),
+    name: z.string().min(1, "Full name is required"),
+    email: z.string().email("Invalid email format"),
+    barangay: z.string().min(1, "Barangay is required"),
     purpose: z.string().min(1, "Purpose is required"),
     contactNumber: z.string().min(1, "Contact number is required"),
-    validId: z.instanceof(File).refine((file) => file.size > 0, "Valid ID is required"),
+    dateOfBirth: z.string().min(1, "Date of birth is required"),
 });
 
 export const barangayIndigencySchema = z.object({
