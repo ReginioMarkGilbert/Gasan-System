@@ -59,6 +59,11 @@ export function Sidebar() {
                 label: "Incident reports",
                 href: "/dashboard?tab=reports",
             },
+            {
+                icon: FileText,
+                label: "Blotter Report",
+                href: "/dashboard?tab=blotter",
+            },
             { icon: HelpCircle, label: "Settings", href: "/dashboard?tab=settings" },
         ];
     } else if (user?.role === "secretary" || user?.role === "chairman") {

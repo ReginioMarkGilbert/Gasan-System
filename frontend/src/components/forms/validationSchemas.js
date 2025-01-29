@@ -78,4 +78,43 @@ export const businessClearanceSchema = z.object({
     validId: z.string().min(1, "Valid ID information is required"),
 });
 
+export const blotterReportSchema = z.object({
+    // Complainant Information
+    complainantName: z.string().min(1, "Full name is required"),
+    complainantAge: z.string().min(1, "Age is required"),
+    complainantGender: z.enum(["Male", "Female", "Other"], {
+        required_error: "Gender is required",
+    }),
+    complainantCivilStatus: z.enum(["Single", "Married", "Widowed", "Separated"], {
+        required_error: "Civil status is required",
+    }),
+    complainantAddress: z.string().min(1, "Address is required"),
+    complainantContact: z.string().min(1, "Contact number is required"),
+
+    // Respondent Information
+    respondentName: z.string().min(1, "Respondent's name is required"),
+    respondentAddress: z.string().optional(),
+    respondentContact: z.string().optional(),
+
+    // Incident Details
+    incidentDate: z.string().min(1, "Date of incident is required"),
+    incidentTime: z.string().min(1, "Time of incident is required"),
+    incidentLocation: z.string().min(1, "Location is required"),
+    incidentType: z.string().min(1, "Type of incident is required"),
+    narrative: z.string().min(10, "Please provide a detailed description of the incident"),
+    motive: z.string().optional(),
+
+    // Witnesses
+    witnessName: z.string().optional(),
+    witnessContact: z.string().optional(),
+
+    // Evidence
+    evidence: z.instanceof(FileList).optional(),
+
+    // Action Requested
+    actionRequested: z.enum(["Mediation", "Barangay Intervention", "Police/Court Action"], {
+        required_error: "Please select desired action",
+    }),
+});
+
 // Add more schemas for other document types as needed
