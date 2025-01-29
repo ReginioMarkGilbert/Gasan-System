@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { UserList } from "./UserList";
 import { Requests } from "@/components/dashboard/Requests.jsx";
 import IncidentReportsPage from "@/pages/IncidentReportsPage";
+import BlotterReportPage from "@/pages/BlotterReportPage";
 // import Settings from "./Settings"; // Import the Settings component
 // import Help from "./Help"; // Import the Help component
 
@@ -15,6 +16,7 @@ const componentMap = {
     // help: Help,
     requests: Requests,
     reports: IncidentReportsPage,
+    blotter: BlotterReportPage,
 };
 
 function Dashboard({ tab }) {
