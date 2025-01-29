@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import BarangayClearanceForm from "./RequestForm/BarangayClearanceForm";
 import BarangayIndigencyForm from "./RequestForm/BarangayIndigencyForm";
 import CedulaForm from "./RequestForm/CedulaForm";
+import BusinessClearanceForm from "./RequestForm/BusinessClearanceForm";
 
 const documentTypes = [
     "Barangay Clearance",
@@ -81,6 +82,8 @@ export default function DocumentRequestForm() {
                 return "barangay-indigency";
             case "cedula":
                 return "cedula";
+            case "business-clearance":
+                return "business-clearance";
             default:
                 return "";
         }
@@ -94,6 +97,8 @@ export default function DocumentRequestForm() {
                 return <BarangayIndigencyForm user={user} onSubmit={handleSubmit} />;
             case "Cedula":
                 return <CedulaForm user={user} onSubmit={handleSubmit} />;
+            case "Barangay Business Clearance":
+                return <BusinessClearanceForm user={user} onSubmit={handleSubmit} />;
             default:
                 return null;
         }
