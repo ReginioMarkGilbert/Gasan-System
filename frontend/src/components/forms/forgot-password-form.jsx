@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 // Components and UI elements
@@ -78,43 +78,59 @@ export default function ForgotPasswordForm({ className }) {
     return (
         <Form {...form}>
             <form
-                className={cn("flex flex-col gap-6", className)}
+                className={cn("space-y-6", className)}
                 onSubmit={form.handleSubmit(handleForgotPassword)}
             >
-                <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Forgot your password?</h1>
-                    <p className="text-balance text-sm text-muted-foreground">
-                        Enter your email address and we will send you a link to reset your password.
+                <div className="space-y-4 text-center">
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                        Forgot your password?
+                    </h1>
+                    <p className="text-sm text-gray-600">
+                        Enter your email and we'll send you instructions to reset your password.
                     </p>
                 </div>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="m@example.com" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Sending..." : "Send reset link"}
+
+                <div className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Email address
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="name@example.com"
+                                        className="h-11"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <Button
+                        type="submit"
+                        className="w-full h-11 bg-green-600 hover:bg-green-700 text-white"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span> Sending reset link...
+                            </div>
+                        ) : (
+                            "Send reset link"
+                        )}
                     </Button>
                 </div>
-                <div className="text-center text-sm">
+
+                <div className="text-center text-sm text-gray-600">
                     Remember your password?{" "}
-                    <p
-                        className="underline underline-offset-4 cursor-pointer"
-                        onClick={() => navigate("/sign-in")}
-                    >
-                        Sign in
-                    </p>
+                    <Link to="/sign-in" className="font-medium text-green-600 hover:text-green-500">
+                        Back to login
+                    </Link>
                 </div>
             </form>
         </Form>

@@ -4,13 +4,12 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 // Components and UI elements
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 
@@ -111,127 +110,132 @@ export function SignupForm({ className }) {
     return (
         <Form {...form}>
             <form
-                className={cn("flex flex-col gap-6", className)}
+                className={cn("space-y-6", className)}
                 onSubmit={form.handleSubmit(handleRegister)}
             >
-                <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Create an account with Company Name</h1>
-                    <p className="text-balance text-sm text-muted-foreground">
-                        Enter your details below to create an account
-                    </p>
+                <div className="space-y-4 text-center">
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                        Create your account
+                    </h1>
+                    <p className="text-sm text-gray-600">Fill in your details to get started</p>
                 </div>
-                <div className="grid gap-2">
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+
+                <div className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Full Name
+                                </FormLabel>
+                                <FormControl>
+                                    <Input {...field} placeholder="John Doe" className="h-11" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="barangay"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Barangay
+                                </FormLabel>
+                                <Select value={field.value} onValueChange={field.onChange}>
                                     <FormControl>
-                                        <Input {...field} placeholder="John Doe" />
+                                        <SelectTrigger className="h-11">
+                                            <SelectValue placeholder="Select your barangay" />
+                                        </SelectTrigger>
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="barangay"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Barangay</FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            value={field.value} // Bind the value
-                                            onValueChange={(value) => {
-                                                field.onChange(value); // Update the field value in react-hook-form
-                                            }}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select Barangay" />
-                                            </SelectTrigger>
-                                            <SelectContent className="w-full">
-                                                {barangays && barangays.length > 0 ? (
-                                                    barangays.map((barangay) => (
-                                                        <SelectItem
-                                                            key={barangay.code}
-                                                            value={barangay.name}
-                                                        >
-                                                            {barangay.name}
-                                                        </SelectItem>
-                                                    ))
-                                                ) : (
-                                                    <p>No barangays available</p>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="m@example.com" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} type="password" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                    <FormControl>
-                                        <Input {...field} type="password" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Creating account..." : "Create Account"}
+                                    <SelectContent>
+                                        {barangays.map((barangay) => (
+                                            <SelectItem key={barangay.code} value={barangay.name}>
+                                                {barangay.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Email
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="m@example.com"
+                                        className="h-11"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Password
+                                </FormLabel>
+                                <FormControl>
+                                    <Input {...field} type="password" className="h-11" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Confirm Password
+                                </FormLabel>
+                                <FormControl>
+                                    <Input {...field} type="password" className="h-11" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <Button
+                        type="submit"
+                        className="w-full h-11 bg-green-600 hover:bg-green-700 text-white"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <span className="animate-spin">⏳</span> Creating account...
+                            </div>
+                        ) : (
+                            "Create account"
+                        )}
                     </Button>
                 </div>
 
-                <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <p
-                        className="underline underline-offset-4 cursor-pointer"
-                        onClick={() => navigate("/sign-in")}
-                    >
+                <div className="text-center text-sm text-gray-600">
+                    Already have an account?{" "}
+                    <Link to="/sign-in" className="font-medium text-green-600 hover:text-green-500">
                         Sign in
-                    </p>
+                    </Link>
                 </div>
             </form>
         </Form>

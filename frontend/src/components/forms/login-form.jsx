@@ -1,7 +1,6 @@
 // filepath: /c:/Users/chest/OneDrive/Documents/Projects/Gasan System/frontend/src/components/forms/login-form.jsx
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { loginFailure, loginStart, loginSuccess } from "@/redux/user/userSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +9,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -91,67 +90,81 @@ export function LoginForm({ className }) {
 
     return (
         <Form {...form}>
-            <form
-                className={cn("flex flex-col gap-6", className)}
-                onSubmit={form.handleSubmit(handleLogin)}
-            >
-                <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Login to your account</h1>
-                    <p className="text-balance text-sm text-muted-foreground">
-                        Enter your email below to login to your account
+            <form className={cn("space-y-6", className)} onSubmit={form.handleSubmit(handleLogin)}>
+                <div className="space-y-4 text-center">
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                        Welcome back
+                    </h1>
+                    <p className="text-sm text-gray-600">
+                        Enter your credentials to access your account
                     </p>
                 </div>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} placeholder="m@example.com" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div className="grid gap-2">
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <div className="flex items-center">
-                                        <Label htmlFor="password">Password</Label>
-                                        <p
-                                            onClick={() => navigate("/forgot-password")}
-                                            className="ml-auto text-sm underline-offset-4 hover:underline cursor-pointer"
-                                        >
-                                            Forgot your password?
-                                        </p>
-                                    </div>
-                                    <FormControl>
-                                        <Input {...field} type="password" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Logging in..." : "Login"}
-                    </Button>
+
+                <div className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-sm font-medium text-gray-700">
+                                    Email address
+                                </FormLabel>
+                                <FormControl>
+                                    <Input
+                                        {...field}
+                                        placeholder="name@example.com"
+                                        className="h-11"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <div className="flex items-center justify-between">
+                                    <FormLabel className="text-sm font-medium text-gray-700">
+                                        Password
+                                    </FormLabel>
+                                    <Link
+                                        to="/forgot-password"
+                                        className="text-sm font-medium text-green-600 hover:text-green-500"
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                </div>
+                                <FormControl>
+                                    <Input {...field} type="password" className="h-11" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
-                <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <p
-                        className="underline underline-offset-4 cursor-pointer"
-                        onClick={() => navigate("/sign-up")}
-                    >
+
+                <Button
+                    type="submit"
+                    className="w-full h-11 bg-green-600 hover:bg-green-700 text-white"
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <div className="flex items-center gap-2">
+                            <span className="animate-spin">⏳</span> Signing in...
+                        </div>
+                    ) : (
+                        "Sign in"
+                    )}
+                </Button>
+
+                <div className="text-center text-sm text-gray-600">
+                    Don't have an account?{" "}
+                    <Link to="/sign-up" className="font-medium text-green-600 hover:text-green-500">
                         Sign up
-                    </p>
+                    </Link>
                 </div>
             </form>
         </Form>
