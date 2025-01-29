@@ -4,13 +4,14 @@ import PrivateRoute from "@/components/private-route.jsx";
 import LandingPage from "@/pages/index.jsx";
 import RegisterBarangayUserPage from "@/pages/register-barangay-user.jsx";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
 import "./App.css";
 import ForgotPassword from "./pages/forgot-password";
+import GetStarted from "./pages/get-started";
 import SignIn from "./pages/login";
 import ResetPassword from "./pages/reset-password";
 import SignUp from "./pages/signup";
 import VerifyOTP from "./pages/verify-otp";
-import { Toaster } from "sonner";
 
 const DashboardWrapper = () => {
     const location = useLocation();
@@ -38,13 +39,14 @@ function App() {
         <>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/get-started" element={<GetStarted />} />
                     <Route path="/sign-up" element={<SignUp />} />
                     <Route path="/sign-in" element={<SignIn />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/admin/register" element={<RegisterBarangayUserPage />} />
                     <Route path="/verify-otp/:randomString" element={<VerifyOTP />} />
                     <Route path="/reset-password/:randomToken" element={<ResetPassword />} />
-                    <Route path="/" element={<LandingPage />} />
                     <Route path="*" element={<PageNotFound />} />
 
                     <Route element={<PrivateRoute />}>
