@@ -82,17 +82,13 @@ export const blotterReportSchema = z.object({
     // Complainant Information
     complainantName: z.string().min(1, "Full name is required"),
     complainantAge: z.string().min(1, "Age is required"),
-    complainantGender: z.enum(["Male", "Female", "Other"], {
-        required_error: "Gender is required",
-    }),
-    complainantCivilStatus: z.enum(["Single", "Married", "Widowed", "Separated"], {
-        required_error: "Civil status is required",
-    }),
+    complainantGender: z.string().min(1, "Gender is required"),
+    complainantCivilStatus: z.string().min(1, "Civil status is required"),
     complainantAddress: z.string().min(1, "Address is required"),
     complainantContact: z.string().min(1, "Contact number is required"),
 
     // Respondent Information
-    respondentName: z.string().min(1, "Respondent's name is required"),
+    respondentName: z.string().min(1, "Respondent name is required"),
     respondentAddress: z.string().optional(),
     respondentContact: z.string().optional(),
 
@@ -101,7 +97,7 @@ export const blotterReportSchema = z.object({
     incidentTime: z.string().min(1, "Time of incident is required"),
     incidentLocation: z.string().min(1, "Location is required"),
     incidentType: z.string().min(1, "Type of incident is required"),
-    narrative: z.string().min(10, "Please provide a detailed description of the incident"),
+    narrative: z.string().min(1, "Narrative is required"),
     motive: z.string().optional(),
 
     // Witnesses
@@ -109,12 +105,10 @@ export const blotterReportSchema = z.object({
     witnessContact: z.string().optional(),
 
     // Evidence
-    evidence: z.instanceof(FileList).optional(),
+    evidence: z.any().optional(),
 
     // Action Requested
-    actionRequested: z.enum(["Mediation", "Barangay Intervention", "Police/Court Action"], {
-        required_error: "Please select desired action",
-    }),
+    actionRequested: z.string().min(1, "Action requested is required"),
 });
 
 // Add more schemas for other document types as needed
