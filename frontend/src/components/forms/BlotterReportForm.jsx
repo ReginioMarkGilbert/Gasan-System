@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { blotterReportSchema } from "./validationSchemas";
@@ -14,35 +14,162 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PropTypes from "prop-types";
+import { Button } from "../ui/button";
+import { getUserFromLocalStorage } from "@/lib/utils";
 
-export default function BlotterReportForm({ onSubmit }) {
+export default function BlotterReportForm({ onSubmit, isSubmitting }) {
+    const [currentUser, setCurrentUser] = useState(null);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue,
+        reset,
     } = useForm({
         resolver: zodResolver(blotterReportSchema),
+        defaultValues: {
+            complainantName: currentUser?.name || "",
+            complainantAddress: currentUser?.barangay || "",
+            complainantGender: "",
+            complainantCivilStatus: "",
+            actionRequested: "",
+        },
     });
 
+    // Initialize user data
+    useEffect(() => {
+        const userData = getUserFromLocalStorage();
+        setCurrentUser(userData);
+        if (userData) {
+            setValue("complainantName", userData.name || "");
+            setValue("complainantAddress", userData.barangay || "");
+        }
+    }, [setValue]);
+
+    // Update form when localStorage changes
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const userData = getUserFromLocalStorage();
+            setCurrentUser(userData);
+            if (userData) {
+                setValue("complainantName", userData.name || "");
+                setValue("complainantAddress", userData.barangay || "");
+            }
+        };
+
+        window.addEventListener("storage", handleStorageChange);
+        return () => {
+            window.removeEventListener("storage", handleStorageChange);
+        };
+    }, [setValue]);
+
+    // Handle Select changes
     const handleGenderChange = useCallback(
-        (value) => setValue("complainantGender", value),
+        (value) => {
+            setValue("complainantGender", value, { shouldValidate: true });
+        },
         [setValue]
     );
 
     const handleCivilStatusChange = useCallback(
-        (value) => setValue("complainantCivilStatus", value),
+        (value) => {
+            setValue("complainantCivilStatus", value, { shouldValidate: true });
+        },
         [setValue]
     );
 
     const handleActionChange = useCallback(
-        (value) => setValue("actionRequested", value),
+        (value) => {
+            setValue("actionRequested", value, { shouldValidate: true });
+        },
         [setValue]
     );
 
-    const handleFormSubmit = (data) => {
-        console.log("BlotterReportForm - Submitting data:", data);
-        onSubmit(data);
+    const convertFileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result.split(",")[1];
+                resolve({
+                    filename: file.name,
+                    contentType: file.type,
+                    data: base64String,
+                });
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    const handleFormSubmit = async (data) => {
+        try {
+            const evidenceFiles = data.evidence ? Array.from(data.evidence) : [];
+            const evidenceBase64 = await Promise.all(
+                evidenceFiles.map((file) => convertFileToBase64(file))
+            );
+
+            // Format the data before submission
+            const submitData = {
+                // Complainant Information
+                complainantName: data.complainantName,
+                complainantAge: data.complainantAge?.toString(),
+                complainantGender: data.complainantGender,
+                complainantCivilStatus: data.complainantCivilStatus,
+                complainantAddress: data.complainantAddress,
+                complainantContact: data.complainantContact,
+
+                // Respondent Information
+                respondentName: data.respondentName,
+                respondentAddress: data.respondentAddress || "",
+                respondentContact: data.respondentContact || "",
+
+                // Incident Details
+                incidentDate: data.incidentDate,
+                incidentTime: data.incidentTime,
+                incidentLocation: data.incidentLocation,
+                incidentType: data.incidentType,
+                narrative: data.narrative,
+                motive: data.motive || "",
+
+                // Witnesses and Evidence
+                witnessName: data.witnessName || "",
+                witnessContact: data.witnessContact || "",
+                evidence: evidenceBase64,
+
+                // Action Requested
+                actionRequested: data.actionRequested,
+            };
+
+            console.log("Submitting data:", submitData);
+
+            // Pass the reset function to the parent component
+            onSubmit(submitData, () => {
+                reset({
+                    complainantName: currentUser?.name || "",
+                    complainantAddress: currentUser?.barangay || "",
+                    complainantGender: "",
+                    complainantCivilStatus: "",
+                    complainantAge: "",
+                    complainantContact: "",
+                    respondentName: "",
+                    respondentAddress: "",
+                    respondentContact: "",
+                    incidentDate: "",
+                    incidentTime: "",
+                    incidentLocation: "",
+                    incidentType: "",
+                    narrative: "",
+                    motive: "",
+                    witnessName: "",
+                    witnessContact: "",
+                    evidence: null,
+                    actionRequested: "",
+                });
+            });
+        } catch (error) {
+            console.error("Error processing form:", error);
+        }
     };
 
     return (
@@ -58,7 +185,8 @@ export default function BlotterReportForm({ onSubmit }) {
                         <Input
                             id="complainantName"
                             {...register("complainantName")}
-                            placeholder="Enter your full name"
+                            defaultValue={currentUser?.name || ""}
+                            readOnly
                         />
                         {errors.complainantName && (
                             <p className="text-red-500 text-sm">{errors.complainantName.message}</p>
@@ -80,7 +208,10 @@ export default function BlotterReportForm({ onSubmit }) {
 
                     <div className="space-y-2">
                         <Label htmlFor="complainantGender">Gender</Label>
-                        <Select onValueChange={handleGenderChange}>
+                        <Select
+                            onValueChange={handleGenderChange}
+                            {...register("complainantGender")}
+                        >
                             <SelectTrigger id="complainantGender">
                                 <SelectValue placeholder="Select gender" />
                             </SelectTrigger>
@@ -99,7 +230,10 @@ export default function BlotterReportForm({ onSubmit }) {
 
                     <div className="space-y-2">
                         <Label htmlFor="complainantCivilStatus">Civil Status</Label>
-                        <Select onValueChange={handleCivilStatusChange}>
+                        <Select
+                            onValueChange={handleCivilStatusChange}
+                            {...register("complainantCivilStatus")}
+                        >
                             <SelectTrigger id="complainantCivilStatus">
                                 <SelectValue placeholder="Select civil status" />
                             </SelectTrigger>
@@ -122,6 +256,7 @@ export default function BlotterReportForm({ onSubmit }) {
                         <Input
                             id="complainantAddress"
                             {...register("complainantAddress")}
+                            defaultValue={currentUser?.barangay || ""}
                             placeholder="Enter your address"
                         />
                         {errors.complainantAddress && (
@@ -296,7 +431,7 @@ export default function BlotterReportForm({ onSubmit }) {
                 <CardContent>
                     <div className="space-y-2">
                         <Label htmlFor="actionRequested">Desired Action</Label>
-                        <Select onValueChange={handleActionChange}>
+                        <Select onValueChange={handleActionChange} {...register("actionRequested")}>
                             <SelectTrigger id="actionRequested">
                                 <SelectValue placeholder="Select desired action" />
                             </SelectTrigger>
@@ -318,12 +453,35 @@ export default function BlotterReportForm({ onSubmit }) {
             </Card>
 
             <div className="flex justify-end space-x-4">
-                <button
-                    type="submit"
-                    className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-                >
-                    Submit Report
-                </button>
+                <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                        <>
+                            <svg
+                                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Submitting...
+                        </>
+                    ) : (
+                        "Submit Report"
+                    )}
+                </Button>
             </div>
         </form>
     );
@@ -331,4 +489,9 @@ export default function BlotterReportForm({ onSubmit }) {
 
 BlotterReportForm.propTypes = {
     onSubmit: PropTypes.func.isRequired,
+    isSubmitting: PropTypes.bool,
+};
+
+BlotterReportForm.defaultProps = {
+    isSubmitting: false,
 };
