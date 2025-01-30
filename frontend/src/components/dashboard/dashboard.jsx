@@ -1,22 +1,36 @@
 import { Requests } from "@/components/dashboard/Requests.jsx";
-import BlotterReportPage from "@/pages/BlotterReportPage";
-import IncidentReportsPage from "@/pages/IncidentReportsPage";
-import { Header } from "./Header";
-import Overview from "./Overview";
-import { UserList } from "./UserList";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
     Sidebar,
     SidebarContent,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuItem,
     SidebarMenuButton,
+    SidebarMenuItem,
     SidebarProvider,
 } from "@/components/ui/sidebar";
 import { cn, getUserFromLocalStorage } from "@/lib/utils";
+import BlotterReportPage from "@/pages/BlotterReportPage";
+import IncidentReportsPage from "@/pages/IncidentReportsPage";
+import { logout } from "@/redux/user/userSlice";
+import axios from "axios";
+import { FileText, LayoutDashboard, LogOut, Mail, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { FileText, LayoutDashboard, Mail, Settings, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Header } from "./Header";
+import Overview from "./Overview";
+import { UserList } from "./UserList";
 
 const componentMap = {
     overview: Overview,
@@ -32,79 +46,114 @@ const componentMap = {
 function Dashboard({ tab }) {
     const ComponentToRender = componentMap[tab] || Overview;
     const [user, setUser] = useState(null);
+    const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutStatus, setLogoutStatus] = useState({ success: false, error: null });
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const user = getUserFromLocalStorage();
         setUser(user);
     }, []);
 
-    const sidebarItems = user?.role === "user"
-        ? [
-            {
-                icon: LayoutDashboard,
-                label: "Overview",
-                href: "/dashboard?tab=overview",
-            },
-            {
-                icon: Mail,
-                label: "Requests",
-                href: "/dashboard?tab=requests"
-            },
-            {
-                icon: FileText,
-                label: "Incident reports",
-                href: "/dashboard?tab=reports",
-            },
-            {
-                icon: FileText,
-                label: "Blotter Report",
-                href: "/dashboard?tab=blotter",
-            },
-            {
-                icon: Settings,
-                label: "Settings",
-                href: "/dashboard?tab=settings"
-            },
-        ]
-        : [
-            {
-                icon: LayoutDashboard,
-                label: "Overview",
-                href: "/dashboard?tab=overview",
-            },
-            {
-                icon: Users,
-                label: "Users",
-                href: "/dashboard?tab=users"
-            },
-            {
-                icon: Mail,
-                label: "Request",
-                href: "/dashboard?tab=request-admin",
-            },
-            {
-                icon: FileText,
-                label: "Incident Report",
-                href: "/dashboard?tab=incident-report-admin",
-            },
-            {
-                icon: Users,
-                label: "Residents",
-                href: "/dashboard?tab=residents"
-            },
-        ];
+    // Handle toast notifications in useEffect
+    useEffect(() => {
+        if (logoutStatus.success) {
+            toast.success("Logged out successfully");
+            setLogoutStatus({ success: false, error: null }); // Reset status
+        }
+        if (logoutStatus.error) {
+            toast.error("An error occurred. Please try again later");
+            setLogoutStatus({ success: false, error: null }); // Reset status
+        }
+    }, [logoutStatus]);
+
+    const handleLogout = async () => {
+        try {
+            setLoggingOut(true);
+            const res = await axios.post("http://localhost:5000/api/auth/logout");
+
+            if (res.status === 200) {
+                dispatch(logout());
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                setLogoutStatus({ success: true, error: null });
+                navigate("/sign-in");
+            }
+        } catch (error) {
+            console.error(error);
+            setLogoutStatus({ success: false, error: error });
+        } finally {
+            setLoggingOut(false);
+        }
+    };
+
+    const sidebarItems =
+        user?.role === "user"
+            ? [
+                  {
+                      icon: LayoutDashboard,
+                      label: "Overview",
+                      href: "/dashboard?tab=overview",
+                  },
+                  {
+                      icon: Mail,
+                      label: "Requests",
+                      href: "/dashboard?tab=requests",
+                  },
+                  {
+                      icon: FileText,
+                      label: "Incident reports",
+                      href: "/dashboard?tab=reports",
+                  },
+                  {
+                      icon: FileText,
+                      label: "Blotter Report",
+                      href: "/dashboard?tab=blotter",
+                  },
+                  {
+                      icon: Settings,
+                      label: "Settings",
+                      href: "/dashboard?tab=settings",
+                  },
+              ]
+            : [
+                  {
+                      icon: LayoutDashboard,
+                      label: "Overview",
+                      href: "/dashboard?tab=overview",
+                  },
+                  {
+                      icon: Users,
+                      label: "Users",
+                      href: "/dashboard?tab=users",
+                  },
+                  {
+                      icon: Mail,
+                      label: "Request",
+                      href: "/dashboard?tab=request-admin",
+                  },
+                  {
+                      icon: FileText,
+                      label: "Incident Report",
+                      href: "/dashboard?tab=incident-report-admin",
+                  },
+                  {
+                      icon: Users,
+                      label: "Residents",
+                      href: "/dashboard?tab=residents",
+                  },
+              ];
 
     return (
         <SidebarProvider>
             <div className="fixed inset-0 flex bg-gray-100">
                 <Sidebar className="border-r border-green-800 bg-green-700 [&_[data-radix-sidebar-content]]:bg-green-700 [&_[data-radix-sidebar-trigger]]:text-white">
                     <SidebarHeader className="border-b border-green-800 p-4 bg-green-700">
-                        <span className="text-2xl font-semibold text-white">
-                            BMS
-                        </span>
+                        <span className="text-2xl font-semibold text-white">BMS</span>
                     </SidebarHeader>
-                    <SidebarContent className="bg-green-700">
-                        <SidebarMenu className="bg-green-700 p-2 space-y-2">
+                    <SidebarContent className="bg-green-700 flex flex-col h-full">
+                        <SidebarMenu className="bg-green-700 p-2 space-y-2 flex-1">
                             {sidebarItems.map((item) => (
                                 <SidebarMenuItem key={item.href} className="bg-green-700">
                                     <SidebarMenuButton
@@ -112,7 +161,8 @@ function Dashboard({ tab }) {
                                         isActive={tab === item.href.split("=")[1]}
                                         className={cn(
                                             "w-full text-white hover:bg-green-600 transition-colors p-2 rounded-lg",
-                                            tab === item.href.split("=")[1] && "bg-green-600 text-white font-semibold"
+                                            tab === item.href.split("=")[1] &&
+                                                "bg-green-600 text-white font-semibold"
                                         )}
                                     >
                                         <Link to={item.href} className="flex items-center gap-3">
@@ -123,6 +173,37 @@ function Dashboard({ tab }) {
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>
+
+                        {/* Logout Section */}
+                        <div className="p-2 mt-auto border-t border-green-800">
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <SidebarMenuButton className="w-full text-white hover:bg-green-600 transition-colors p-2 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <LogOut className="h-4 w-4" />
+                                            <span>Logout</span>
+                                        </div>
+                                    </SidebarMenuButton>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Are you sure you want to logout?
+                                        </AlertDialogTitle>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleLogout}
+                                            disabled={loggingOut}
+                                            className="bg-red-500 hover:bg-red-600"
+                                        >
+                                            {loggingOut ? "Logging out..." : "Yes, Logout"}
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
                     </SidebarContent>
                 </Sidebar>
                 <div className="flex-1 flex flex-col min-h-0">
