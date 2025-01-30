@@ -19,8 +19,6 @@ export default function Header() {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    const menuItems = [{ href: "/", label: "Home" }];
-
     return (
         <header
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -28,19 +26,13 @@ export default function Header() {
             }`}
         >
             <div className="container mx-auto px-4 flex justify-between items-center">
-                <Link to="/" className="text-2xl font-bold text-white">
-                    GASAN BMS
+                <Link to="/" className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white">
+                        <img src="/logo.svg" alt="Logo" className="h-6 w-6" />
+                    </div>
+                    <span className="text-2xl font-bold text-white">GASAN BMS</span>
                 </Link>
                 <nav className="hidden md:flex space-x-4 items-center">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            to={item.href}
-                            className="text-white hover:text-green-200"
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
                     <Button className="bg-white text-green-700 hover:bg-green-100">
                         <Link to="/sign-in">Login</Link>
                     </Button>
@@ -56,16 +48,6 @@ export default function Header() {
                     </SheetTrigger>
                     <SheetContent side="right" className="bg-green-700 text-white">
                         <nav className="flex flex-col space-y-4 mt-6">
-                            {menuItems.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    to={item.href}
-                                    className="text-lg hover:text-green-200"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    {item.label}
-                                </Link>
-                            ))}
                             <Link
                                 to="/sign-in"
                                 className="text-lg hover:text-green-200"
