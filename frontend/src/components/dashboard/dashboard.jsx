@@ -47,6 +47,7 @@ function Dashboard({ tab }) {
     const ComponentToRender = componentMap[tab] || Overview;
     const [user, setUser] = useState(null);
     const [loggingOut, setLoggingOut] = useState(false);
+    const [logoutStatus, setLogoutStatus] = useState({ success: false, error: null });
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -54,6 +55,18 @@ function Dashboard({ tab }) {
         const user = getUserFromLocalStorage();
         setUser(user);
     }, []);
+
+    // Handle toast notifications in useEffect
+    useEffect(() => {
+        if (logoutStatus.success) {
+            toast.success("Logged out successfully");
+            setLogoutStatus({ success: false, error: null }); // Reset status
+        }
+        if (logoutStatus.error) {
+            toast.error("An error occurred. Please try again later");
+            setLogoutStatus({ success: false, error: null }); // Reset status
+        }
+    }, [logoutStatus]);
 
     const handleLogout = async () => {
         try {
@@ -64,13 +77,13 @@ function Dashboard({ tab }) {
                 dispatch(logout());
                 localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                setLoggingOut(false);
+                setLogoutStatus({ success: true, error: null });
                 navigate("/sign-in");
-                toast.success("Logged out successfully");
             }
         } catch (error) {
             console.error(error);
-            toast.error("An error occurred. Please try again later");
+            setLogoutStatus({ success: false, error: error });
+        } finally {
             setLoggingOut(false);
         }
     };
