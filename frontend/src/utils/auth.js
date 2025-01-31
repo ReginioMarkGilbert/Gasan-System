@@ -1,7 +1,7 @@
 import { store } from "@/redux/store";
 import { loginSuccess } from "@/redux/user/userSlice";
 import api from "@/lib/axios";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export const checkAuth = () => {
     const token = localStorage.getItem("token");
@@ -12,7 +12,7 @@ export const checkAuth = () => {
 
     try {
         // Decode the token to get user data
-        const decodedToken = jwt_decode(token);
+        const decodedToken = jwtDecode(token);
 
         // Check if token is expired
         if (decodedToken.exp * 1000 < Date.now()) {
