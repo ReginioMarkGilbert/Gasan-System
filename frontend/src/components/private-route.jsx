@@ -1,6 +1,6 @@
-import { loginSuccess, logout } from "@/redux/user/userSlice.js";
-import { jwtDecode } from "jwt-decode";
-import { useEffect } from "react";
+import { logout } from "@/redux/user/userSlice";
+import { checkAuth } from "@/utils/auth";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
@@ -8,44 +8,37 @@ const PrivateRoute = () => {
     const { currentUser } = useSelector((state) => state.user);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [isVerifying, setIsVerifying] = useState(true);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate("/sign-in");
-            return;
-        }
-
-        try {
-            const decodedToken = jwtDecode(token);
-            const currentTime = Date.now() / 1000;
-
-            if (decodedToken.exp < currentTime) {
+        const verifyAuth = async () => {
+            try {
+                const isAuthenticated = await checkAuth();
+                if (!isAuthenticated) {
+                    dispatch(logout());
+                    navigate("/sign-in");
+                }
+            } catch (error) {
+                console.error("Auth verification failed:", error);
                 dispatch(logout());
-                window.alert("Session expired. Please sign in again.");
-                localStorage.removeItem("token");
                 navigate("/sign-in");
-            } else {
-                const userData = {
-                    id: decodedToken.id,
-                    name: decodedToken.name,
-                    email: decodedToken.email,
-                    role: decodedToken.role,
-                    barangay: decodedToken.barangay,
-                    isVerified: decodedToken.isVerified,
-                    createdAt: decodedToken.createdAt,
-                    updatedAt: decodedToken.updatedAt,
-                };
-                dispatch(loginSuccess(userData));
+            } finally {
+                setIsVerifying(false);
             }
-        } catch (error) {
-            console.error(error);
-            localStorage.removeItem("token");
-            navigate("/sign-in");
-        }
-    }, [navigate, dispatch]);
+        };
 
-    return currentUser ? <Outlet /> : <Navigate to="sign-in" />;
+        if (!currentUser) {
+            verifyAuth();
+        } else {
+            setIsVerifying(false);
+        }
+    }, [currentUser, dispatch, navigate]);
+
+    if (isVerifying) {
+        return null; // or a loading spinner
+    }
+
+    return currentUser ? <Outlet /> : <Navigate to="/sign-in" />;
 };
 
 export default PrivateRoute;

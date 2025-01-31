@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { barangayIndigencySchema } from "../validationSchemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PropTypes from "prop-types";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function BarangayIndigencyForm({ onSubmit, initialData, onDataChange }) {
-    const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -33,22 +33,13 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
         onDataChange?.(formValues);
     }, [formValues, onDataChange]);
 
-    // Update form when localStorage changes
+    // Update form when user changes
     useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("name", userData.name || "");
-                setValue("barangay", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
+        if (currentUser) {
+            setValue("name", currentUser.name || "");
+            setValue("barangay", currentUser.barangay || "");
+        }
+    }, [currentUser, setValue]);
 
     const handleFormSubmit = (data) => {
         const formData = {

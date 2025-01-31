@@ -17,12 +17,14 @@ export const verifyToken = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        console.error("Token verification error:", error);
-        return res.status(403).json({
+        return res.status(401).json({
             success: false,
             message: "Invalid token",
         });
     }
 };
+
+// For backward compatibility
+export const verifyJWT = verifyToken;
 
 export default verifyToken;

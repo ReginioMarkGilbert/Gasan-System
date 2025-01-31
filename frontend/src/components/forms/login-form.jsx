@@ -6,13 +6,14 @@ import { loginFailure, loginStart, loginSuccess } from "@/redux/user/userSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import api from "@/lib/axios";
 
 const schema = z.object({
     email: z.string().email(),
@@ -24,12 +25,6 @@ export function LoginForm({ className }) {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (currentUser) {
-            navigate("/dashboard?tab=overview");
-        }
-    }, [currentUser, navigate]);
 
     const form = useForm({
         resolver: zodResolver(schema),
@@ -52,15 +47,12 @@ export function LoginForm({ className }) {
             });
 
             if (response.status === 200 && response.data.success) {
-                const { token, user } = response.data;
-
-                // Only store token in localStorage
+                const { user, token } = response.data;
                 localStorage.setItem("token", token);
-
-                // Store complete user data in Redux
-                dispatch(loginSuccess(user));
+                api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+                dispatch(loginSuccess({ ...user, token }));
                 toast.success("Logged in successfully");
-                navigate("/dashboard?tab=overview");
+                navigate("/dashboard?tab=overview", { replace: true });
             }
         } catch (error) {
             console.error(error);

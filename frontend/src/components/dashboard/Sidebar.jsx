@@ -90,7 +90,6 @@ export function Sidebar() {
 
             if (res.status === 200) {
                 dispatch(logout());
-                localStorage.removeItem("token");
                 navigate("/sign-in");
                 toast.success("Logged out successfully");
             }
