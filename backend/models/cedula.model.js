@@ -34,18 +34,8 @@ const cedulaSchema = new mongoose.Schema(
         },
         employerName: String,
         employerAddress: String,
-        incomeSource: {
-            type: String,
-            required: true,
-        },
-        grossAnnualIncome: {
-            type: String,
-            required: true,
-        },
-        businessGrossSales: String,
-        realEstateIncome: String,
-        validId: {
-            type: String,
+        tax: {
+            type: Number,
             required: true,
         },
         status: {

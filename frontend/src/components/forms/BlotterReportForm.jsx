@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { blotterReportSchema } from "./validationSchemas";
@@ -15,10 +15,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PropTypes from "prop-types";
 import { Button } from "../ui/button";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function BlotterReportForm({ onSubmit, isSubmitting }) {
-    const [currentUser, setCurrentUser] = useState(null);
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -37,32 +37,13 @@ export default function BlotterReportForm({ onSubmit, isSubmitting }) {
         },
     });
 
-    // Initialize user data
+    // Update form when user changes
     useEffect(() => {
-        const userData = getUserFromLocalStorage();
-        setCurrentUser(userData);
-        if (userData) {
-            setValue("complainantName", userData.name || "");
-            setValue("complainantAddress", userData.barangay || "");
+        if (currentUser) {
+            setValue("complainantName", currentUser.name || "");
+            setValue("complainantAddress", currentUser.barangay || "");
         }
-    }, [setValue]);
-
-    // Update form when localStorage changes
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("complainantName", userData.name || "");
-                setValue("complainantAddress", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
+    }, [currentUser, setValue]);
 
     // Handle Select changes
     const handleGenderChange = useCallback(

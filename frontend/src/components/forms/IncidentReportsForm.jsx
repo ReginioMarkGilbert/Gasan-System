@@ -16,7 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { toast } from "sonner";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 const incidentCategories = {
     "Crime-Related Incidents": [
@@ -46,21 +46,9 @@ const incidentCategories = {
 };
 
 export default function IncidentReportForm() {
+    const { currentUser } = useSelector((state) => state.user);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [user, setUser] = useState(() => getUserFromLocalStorage());
-
-    // Update user when localStorage changes
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setUser(getUserFromLocalStorage());
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
 
     const {
         register,
@@ -71,18 +59,18 @@ export default function IncidentReportForm() {
     } = useForm({
         resolver: zodResolver(incidentReportSchema),
         defaultValues: {
-            reporterName: user?.name || "",
-            location: user?.barangay || "",
+            reporterName: currentUser?.name || "",
+            location: currentUser?.barangay || "",
         },
     });
 
     // Update form when user changes
     useEffect(() => {
-        if (user) {
-            setValue("reporterName", user.name || "");
-            setValue("location", user.barangay || "");
+        if (currentUser) {
+            setValue("reporterName", currentUser.name || "");
+            setValue("location", currentUser.barangay || "");
         }
-    }, [user, setValue]);
+    }, [currentUser, setValue]);
 
     // Use useEffect to handle category changes
     useEffect(() => {
@@ -228,7 +216,7 @@ export default function IncidentReportForm() {
                                 id="location"
                                 {...register("location")}
                                 placeholder="Enter the incident location"
-                                defaultValue={user?.barangay || ""}
+                                defaultValue={currentUser?.barangay || ""}
                             />
                             {errors.location && (
                                 <p className="text-red-500 text-sm">{errors.location.message}</p>
@@ -252,7 +240,7 @@ export default function IncidentReportForm() {
                                 id="reporterName"
                                 {...register("reporterName")}
                                 placeholder="Enter your full name"
-                                defaultValue={user?.name || ""}
+                                defaultValue={currentUser?.name || ""}
                             />
                             {errors.reporterName && (
                                 <p className="text-red-500 text-sm">

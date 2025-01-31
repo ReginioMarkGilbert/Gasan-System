@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cedulaSchema } from "../validationSchemas";
@@ -12,10 +12,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import PropTypes from "prop-types";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function CedulaForm({ onSubmit, initialData, onDataChange }) {
-    const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -34,11 +34,7 @@ export default function CedulaForm({ onSubmit, initialData, onDataChange }) {
             occupation: initialData?.occupation || "",
             employerName: initialData?.employerName || "",
             employerAddress: initialData?.employerAddress || "",
-            incomeSource: initialData?.incomeSource || "",
-            grossAnnualIncome: initialData?.grossAnnualIncome || "",
-            businessGrossSales: initialData?.businessGrossSales || "",
-            realEstateIncome: initialData?.realEstateIncome || "",
-            validId: initialData?.validId || "",
+            tax: initialData?.tax || "",
         },
     });
 
@@ -48,28 +44,20 @@ export default function CedulaForm({ onSubmit, initialData, onDataChange }) {
         onDataChange?.(formValues);
     }, [formValues, onDataChange]);
 
+    // Update form when user changes
+    useEffect(() => {
+        if (currentUser) {
+            setValue("name", currentUser.name || "");
+            setValue("barangay", currentUser.barangay || "");
+        }
+    }, [currentUser, setValue]);
+
     const handleCivilStatusChange = useCallback(
         (value) => {
             setValue("civilStatus", value);
         },
         [setValue]
     );
-
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("name", userData.name || "");
-                setValue("barangay", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
 
     const handleFormSubmit = (data) => {
         console.log("CedulaForm - Submitting data:", data);
@@ -181,72 +169,17 @@ export default function CedulaForm({ onSubmit, initialData, onDataChange }) {
                     )}
                 </div>
 
-                {/* Income Information */}
+                {/* Tax Information */}
                 <div className="space-y-2">
-                    <Label htmlFor="incomeSource">Source of Income</Label>
+                    <Label htmlFor="tax">Tax Amount</Label>
                     <Input
-                        id="incomeSource"
-                        {...register("incomeSource")}
-                        placeholder="Enter source of income"
-                    />
-                    {errors.incomeSource && (
-                        <p className="text-red-500 text-sm">{errors.incomeSource.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="grossAnnualIncome">Gross Annual Income</Label>
-                    <Input
-                        id="grossAnnualIncome"
+                        id="tax"
                         type="number"
                         step="0.01"
-                        {...register("grossAnnualIncome")}
-                        placeholder="Enter gross annual income"
+                        {...register("tax")}
+                        placeholder="Enter tax amount"
                     />
-                    {errors.grossAnnualIncome && (
-                        <p className="text-red-500 text-sm">{errors.grossAnnualIncome.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="businessGrossSales">Business Gross Sales (if applicable)</Label>
-                    <Input
-                        id="businessGrossSales"
-                        type="number"
-                        step="0.01"
-                        {...register("businessGrossSales")}
-                        placeholder="Enter business gross sales"
-                    />
-                    {errors.businessGrossSales && (
-                        <p className="text-red-500 text-sm">{errors.businessGrossSales.message}</p>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="realEstateIncome">Real Estate Income (if applicable)</Label>
-                    <Input
-                        id="realEstateIncome"
-                        type="number"
-                        step="0.01"
-                        {...register("realEstateIncome")}
-                        placeholder="Enter real estate income"
-                    />
-                    {errors.realEstateIncome && (
-                        <p className="text-red-500 text-sm">{errors.realEstateIncome.message}</p>
-                    )}
-                </div>
-
-                {/* ID Information */}
-                <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="validId">Valid ID Information</Label>
-                    <Input
-                        id="validId"
-                        {...register("validId")}
-                        placeholder="Enter valid ID information"
-                    />
-                    {errors.validId && (
-                        <p className="text-red-500 text-sm">{errors.validId.message}</p>
-                    )}
+                    {errors.tax && <p className="text-red-500 text-sm">{errors.tax.message}</p>}
                 </div>
             </div>
         </form>

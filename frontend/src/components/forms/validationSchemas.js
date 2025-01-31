@@ -13,7 +13,6 @@ export const barangayIndigencySchema = z.object({
     name: z.string().min(1, "Full name is required"),
     barangay: z.string().min(1, "Barangay is required"),
     contactNumber: z.string().min(1, "Contact number is required"),
-    monthlyIncome: z.string().min(1, "Monthly income is required"),
     purpose: z.string().min(1, "Purpose is required"),
 });
 
@@ -49,11 +48,10 @@ export const cedulaSchema = z.object({
     occupation: z.string().min(1, "Occupation is required"),
     employerName: z.string().optional(),
     employerAddress: z.string().optional(),
-    incomeSource: z.string().min(1, "Source of income is required"),
-    grossAnnualIncome: z.string().min(1, "Gross annual income is required"),
-    businessGrossSales: z.string().optional(),
-    realEstateIncome: z.string().optional(),
-    validId: z.string().min(1, "Valid ID information is required"),
+    tax: z
+        .string()
+        .min(1, "Tax amount is required")
+        .transform((val) => parseFloat(val)),
 });
 
 export const businessClearanceSchema = z.object({

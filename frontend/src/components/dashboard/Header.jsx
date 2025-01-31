@@ -10,17 +10,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { logout } from "@/redux/user/userSlice";
 import { Bell, Menu, Search, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import axios from "axios";
 
 export function Header() {
-    const [user, setUser] = useState(null);
+    const { currentUser } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const user = getUserFromLocalStorage();
-        setUser(user);
-    }, []);
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post("http://localhost:5000/api/auth/logout");
+
+            if (res.status === 200) {
+                dispatch(logout());
+                localStorage.removeItem("token");
+                navigate("/sign-in");
+                toast.success("Logged out successfully");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred. Please try again later");
+        }
+    };
+
     return (
         <header className="bg-green-700 border-b px-4 py-3 sticky top-0 z-10">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -44,17 +61,23 @@ export function Header() {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                                 <Avatar className="h-8 w-8">
-                                    <AvatarImage src="/avatars/01.png" alt="John Doe" />
-                                    <AvatarFallback>{user?.name[0].toUpperCase()}</AvatarFallback>
+                                    <AvatarImage src="/avatars/01.png" alt={currentUser?.name} />
+                                    <AvatarFallback>
+                                        {currentUser?.name
+                                            ? currentUser.name[0].toUpperCase()
+                                            : "U"}
+                                    </AvatarFallback>
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-56" align="end" forceMount>
                             <DropdownMenuLabel className="font-normal">
                                 <div className="flex flex-col space-y-1">
-                                    <p className="text-sm font-medium leading-none">{user?.name}</p>
+                                    <p className="text-sm font-medium leading-none">
+                                        {currentUser?.name}
+                                    </p>
                                     <p className="text-xs leading-none text-muted-foreground">
-                                        {user?.email}
+                                        {currentUser?.email}
                                     </p>
                                 </div>
                             </DropdownMenuLabel>
@@ -68,7 +91,7 @@ export function Header() {
                                 <span>Notifications</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Log out</DropdownMenuItem>
+                            <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

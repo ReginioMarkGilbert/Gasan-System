@@ -6,13 +6,14 @@ import { loginFailure, loginStart, loginSuccess } from "@/redux/user/userSlice";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import PropTypes from "prop-types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import api from "@/lib/axios";
 
 const schema = z.object({
     email: z.string().email(),
@@ -24,14 +25,6 @@ export function LoginForm({ className }) {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (currentUser) {
-            navigate("/dashboard?tab=home");
-        } else {
-            navigate("/sign-in");
-        }
-    }, [currentUser, navigate]);
 
     const form = useForm({
         resolver: zodResolver(schema),
@@ -45,12 +38,6 @@ export function LoginForm({ className }) {
         try {
             setLoading(true);
             dispatch(loginStart());
-            const { email, password } = values;
-
-            if (!email || !password) {
-                toast.error("All fields are required.");
-                return;
-            }
 
             const response = await axios.post("http://localhost:5000/api/auth/login", values, {
                 headers: {
@@ -59,32 +46,20 @@ export function LoginForm({ className }) {
                 },
             });
 
-            const data = response.data;
-
-            if (response.status === 200) {
-                const user = {
-                    _id: data._id,
-                    name: data.name,
-                    email: data.email,
-                    barangay: data.barangay,
-                    isVerified: data.isVerified,
-                    role: data.role,
-                    createdAt: data.createdAt,
-                    updatedAt: data.updatedAt,
-                };
-
-                localStorage.setItem("user", JSON.stringify(user));
-                dispatch(loginSuccess(user));
-                localStorage.setItem("token", data.token);
-                toast.success("Logged in successfully.");
-                setLoading(false);
-                navigate("/dashboard?tab=overview");
+            if (response.status === 200 && response.data.success) {
+                const { user, token } = response.data;
+                localStorage.setItem("token", token);
+                api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+                dispatch(loginSuccess({ ...user, token }));
+                toast.success("Logged in successfully");
+                navigate("/dashboard?tab=overview", { replace: true });
             }
         } catch (error) {
-            setLoading(false);
-            dispatch(loginFailure(error.response?.data?.message || "Login failed"));
             console.error(error);
-            toast.error("Invalid email or password.");
+            dispatch(loginFailure(error.response?.data?.message || "Login failed"));
+            toast.error(error.response?.data?.message || "An error occurred during login");
+        } finally {
+            setLoading(false);
         }
     };
 

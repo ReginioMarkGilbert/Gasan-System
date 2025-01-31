@@ -8,7 +8,9 @@ import {
     verifiedEmail,
     verifyEmail,
     verifyOTP,
+    verifyToken as verifyTokenController,
 } from "../controllers/auth.controller.js";
+import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
@@ -43,5 +45,8 @@ router.post("/verify-otp", verifyOTP);
 // Reset password route
 // POST /api/auth/reset-password
 router.post("/reset-password", resetPassword);
+
+// Verify token route
+router.get("/verify", verifyToken, verifyTokenController);
 
 export default router;

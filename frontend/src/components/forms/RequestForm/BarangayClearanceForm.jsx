@@ -5,11 +5,10 @@ import { barangayClearanceSchema } from "../validationSchemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PropTypes from "prop-types";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function BarangayClearanceForm({ onSubmit, initialData, onDataChange }) {
-    // Get user data directly from localStorage
-    const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -35,23 +34,14 @@ export default function BarangayClearanceForm({ onSubmit, initialData, onDataCha
         onDataChange?.(formValues);
     }, [formValues, onDataChange]);
 
-    // Update form when localStorage changes
+    // Update form when user changes
     useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("name", userData.name || "");
-                setValue("email", userData.email || "");
-                setValue("barangay", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
+        if (currentUser) {
+            setValue("name", currentUser.name || "");
+            setValue("email", currentUser.email || "");
+            setValue("barangay", currentUser.barangay || "");
+        }
+    }, [currentUser, setValue]);
 
     const handleFormSubmit = (data) => {
         console.log("Submitting clearance form with data:", data);

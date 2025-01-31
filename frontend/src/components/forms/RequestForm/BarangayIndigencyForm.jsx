@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { barangayIndigencySchema } from "../validationSchemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PropTypes from "prop-types";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function BarangayIndigencyForm({ onSubmit, initialData, onDataChange }) {
-    const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -22,7 +22,6 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
             name: currentUser?.name || "",
             barangay: currentUser?.barangay || "",
             contactNumber: initialData?.contactNumber || "",
-            monthlyIncome: initialData?.monthlyIncome || "",
             purpose: initialData?.purpose || "",
         },
     });
@@ -33,30 +32,17 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
         onDataChange?.(formValues);
     }, [formValues, onDataChange]);
 
-    // Update form when localStorage changes
+    // Update form when user changes
     useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("name", userData.name || "");
-                setValue("barangay", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
+        if (currentUser) {
+            setValue("name", currentUser.name || "");
+            setValue("barangay", currentUser.barangay || "");
+        }
+    }, [currentUser, setValue]);
 
     const handleFormSubmit = (data) => {
-        const formData = {
-            ...data,
-            monthlyIncome: parseFloat(data.monthlyIncome),
-        };
-        console.log("Submitting indigency form with data:", formData);
-        onSubmit(formData, "barangay-indigency");
+        console.log("Submitting indigency form with data:", data);
+        onSubmit(data, "barangay-indigency");
     };
 
     return (
@@ -94,20 +80,6 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
                     />
                     {errors.contactNumber && (
                         <p className="text-red-500 text-sm">{errors.contactNumber.message}</p>
-                    )}
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="monthlyIncome">Monthly Income</Label>
-                    <Input
-                        id="monthlyIncome"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        {...register("monthlyIncome")}
-                        placeholder="Enter your monthly income"
-                    />
-                    {errors.monthlyIncome && (
-                        <p className="text-red-500 text-sm">{errors.monthlyIncome.message}</p>
                     )}
                 </div>
                 <div className="space-y-2 md:col-span-2">

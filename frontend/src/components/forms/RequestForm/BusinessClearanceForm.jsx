@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessClearanceSchema } from "../validationSchemas";
@@ -12,10 +12,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import PropTypes from "prop-types";
-import { getUserFromLocalStorage } from "@/lib/utils";
+import { useSelector } from "react-redux";
 
 export default function BusinessClearanceForm({ onSubmit, initialData, onDataChange }) {
-    const [currentUser, setCurrentUser] = useState(() => getUserFromLocalStorage());
+    const { currentUser } = useSelector((state) => state.user);
 
     const {
         register,
@@ -52,23 +52,14 @@ export default function BusinessClearanceForm({ onSubmit, initialData, onDataCha
         }
     }, [formValues, onDataChange]);
 
-    // Update form when localStorage changes
+    // Update form when user changes
     useEffect(() => {
-        const handleStorageChange = () => {
-            const userData = getUserFromLocalStorage();
-            setCurrentUser(userData);
-            if (userData) {
-                setValue("ownerName", userData.name || "");
-                setValue("email", userData.email || "");
-                setValue("barangay", userData.barangay || "");
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, [setValue]);
+        if (currentUser) {
+            setValue("ownerName", currentUser.name || "");
+            setValue("email", currentUser.email || "");
+            setValue("barangay", currentUser.barangay || "");
+        }
+    }, [currentUser, setValue]);
 
     // Handle business nature selection
     const handleBusinessNatureChange = useCallback(
