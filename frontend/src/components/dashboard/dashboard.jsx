@@ -25,7 +25,7 @@ import { logout } from "@/redux/user/userSlice";
 import axios from "axios";
 import { FileText, LayoutDashboard, LogOut, Mail, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Header } from "./Header";
@@ -45,28 +45,10 @@ const componentMap = {
 
 function Dashboard({ tab }) {
     const ComponentToRender = componentMap[tab] || Overview;
-    const [user, setUser] = useState(null);
     const [loggingOut, setLoggingOut] = useState(false);
-    const [logoutStatus, setLogoutStatus] = useState({ success: false, error: null });
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const user = getUserFromLocalStorage();
-        setUser(user);
-    }, []);
-
-    // Handle toast notifications in useEffect
-    useEffect(() => {
-        if (logoutStatus.success) {
-            toast.success("Logged out successfully");
-            setLogoutStatus({ success: false, error: null }); // Reset status
-        }
-        if (logoutStatus.error) {
-            toast.error("An error occurred. Please try again later");
-            setLogoutStatus({ success: false, error: null }); // Reset status
-        }
-    }, [logoutStatus]);
+    const { currentUser } = useSelector((state) => state.user);
 
     const handleLogout = async () => {
         try {
@@ -75,21 +57,20 @@ function Dashboard({ tab }) {
 
             if (res.status === 200) {
                 dispatch(logout());
-                localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                setLogoutStatus({ success: true, error: null });
                 navigate("/sign-in");
+                toast.success("Logged out successfully");
             }
         } catch (error) {
             console.error(error);
-            setLogoutStatus({ success: false, error: error });
+            toast.error("An error occurred. Please try again later");
         } finally {
             setLoggingOut(false);
         }
     };
 
     const sidebarItems =
-        user?.role === "user"
+        currentUser?.role === "user"
             ? [
                   {
                       icon: LayoutDashboard,

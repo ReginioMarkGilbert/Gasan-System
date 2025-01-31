@@ -11,7 +11,11 @@ const PrivateRoute = () => {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        console.log(token);
+        if (!token) {
+            navigate("/sign-in");
+            return;
+        }
+
         try {
             const decodedToken = jwtDecode(token);
             const currentTime = Date.now() / 1000;
@@ -19,11 +23,20 @@ const PrivateRoute = () => {
             if (decodedToken.exp < currentTime) {
                 dispatch(logout());
                 window.alert("Session expired. Please sign in again.");
-                localStorage.removeItem("user");
                 localStorage.removeItem("token");
                 navigate("/sign-in");
             } else {
-                dispatch(loginSuccess(decodedToken));
+                const userData = {
+                    id: decodedToken.id,
+                    name: decodedToken.name,
+                    email: decodedToken.email,
+                    role: decodedToken.role,
+                    barangay: decodedToken.barangay,
+                    isVerified: decodedToken.isVerified,
+                    createdAt: decodedToken.createdAt,
+                    updatedAt: decodedToken.updatedAt,
+                };
+                dispatch(loginSuccess(userData));
             }
         } catch (error) {
             console.error(error);

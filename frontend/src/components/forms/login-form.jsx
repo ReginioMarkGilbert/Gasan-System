@@ -27,9 +27,7 @@ export function LoginForm({ className }) {
 
     useEffect(() => {
         if (currentUser) {
-            navigate("/dashboard?tab=home");
-        } else {
-            navigate("/sign-in");
+            navigate("/dashboard?tab=overview");
         }
     }, [currentUser, navigate]);
 
@@ -45,12 +43,6 @@ export function LoginForm({ className }) {
         try {
             setLoading(true);
             dispatch(loginStart());
-            const { email, password } = values;
-
-            if (!email || !password) {
-                toast.error("All fields are required.");
-                return;
-            }
 
             const response = await axios.post("http://localhost:5000/api/auth/login", values, {
                 headers: {
@@ -59,32 +51,23 @@ export function LoginForm({ className }) {
                 },
             });
 
-            const data = response.data;
+            if (response.status === 200 && response.data.success) {
+                const { token, user } = response.data;
 
-            if (response.status === 200) {
-                const user = {
-                    _id: data._id,
-                    name: data.name,
-                    email: data.email,
-                    barangay: data.barangay,
-                    isVerified: data.isVerified,
-                    role: data.role,
-                    createdAt: data.createdAt,
-                    updatedAt: data.updatedAt,
-                };
+                // Only store token in localStorage
+                localStorage.setItem("token", token);
 
-                localStorage.setItem("user", JSON.stringify(user));
+                // Store complete user data in Redux
                 dispatch(loginSuccess(user));
-                localStorage.setItem("token", data.token);
-                toast.success("Logged in successfully.");
-                setLoading(false);
+                toast.success("Logged in successfully");
                 navigate("/dashboard?tab=overview");
             }
         } catch (error) {
-            setLoading(false);
-            dispatch(loginFailure(error.response?.data?.message || "Login failed"));
             console.error(error);
-            toast.error("Invalid email or password.");
+            dispatch(loginFailure(error.response?.data?.message || "Login failed"));
+            toast.error(error.response?.data?.message || "An error occurred during login");
+        } finally {
+            setLoading(false);
         }
     };
 

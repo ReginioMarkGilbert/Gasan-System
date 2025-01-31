@@ -1,6 +1,6 @@
-import { cn, getUserFromLocalStorage } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { logout } from "@/redux/user/userSlice";
-import axios from "axios";
+import api from "@/lib/axios";
 import { motion } from "framer-motion";
 import {
     ChevronRight,
@@ -13,8 +13,8 @@ import {
     User2Icon,
     Users,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -36,17 +36,12 @@ export function Sidebar() {
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [loggingOut, setLoggingOut] = useState(false);
-    const [user, setUser] = useState(null);
+    const { currentUser } = useSelector((state) => state.user);
     const currentTab = new URLSearchParams(location.search).get("tab");
-
-    useEffect(() => {
-        const user = getUserFromLocalStorage();
-        setUser(user);
-    }, []);
 
     let sidebarItems = [];
 
-    if (user?.role === "user") {
+    if (currentUser?.role === "user") {
         sidebarItems = [
             {
                 icon: LayoutDashboard,
@@ -66,7 +61,7 @@ export function Sidebar() {
             },
             { icon: HelpCircle, label: "Settings", href: "/dashboard?tab=settings" },
         ];
-    } else if (user?.role === "secretary" || user?.role === "chairman") {
+    } else if (currentUser?.role === "secretary" || currentUser?.role === "chairman") {
         sidebarItems = [
             {
                 icon: LayoutDashboard,
@@ -91,19 +86,19 @@ export function Sidebar() {
     const handleLogout = async () => {
         try {
             setLoggingOut(true);
-            const res = await axios.post("http://localhost:5000/api/auth/logout");
+            const res = await api.post("/auth/logout");
 
             if (res.status === 200) {
                 dispatch(logout());
-                localStorage.removeItem("user");
                 localStorage.removeItem("token");
-                setLoggingOut(false);
                 navigate("/sign-in");
                 toast.success("Logged out successfully");
             }
         } catch (error) {
             console.error(error);
             toast.error("An error occurred. Please try again later");
+        } finally {
+            setLoggingOut(false);
         }
     };
 

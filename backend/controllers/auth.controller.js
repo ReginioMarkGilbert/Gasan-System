@@ -73,29 +73,38 @@ export const login = async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({
+            return res.status(404).json({
                 success: false,
-                message: "Email or password is incorrect!",
+                message: "User not found!",
             });
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
 
         if (!validPassword) {
-            return res.status(400).json({
+            return res.status(401).json({
                 success: false,
-                message: "Email or password is incorrect!",
+                message: "Invalid credentials!",
             });
         }
 
-        // Set token
-        const token = setToken(res, user._id);
+        const userData = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            barangay: user.barangay,
+            isVerified: user.isVerified,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        };
+
+        const token = setToken(res, userData);
 
         res.status(200).json({
             success: true,
-            message: "Logged in successfully",
-            ...user._doc,
-            password: undefined,
+            message: "Logged in successfully!",
+            user: userData,
             token,
         });
     } catch (error) {
