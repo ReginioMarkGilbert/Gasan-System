@@ -13,10 +13,6 @@ const BarangayIndigencySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    monthlyIncome: {
-        type: Number,
-        required: true,
-    },
     purpose: {
         type: String,
         required: true,

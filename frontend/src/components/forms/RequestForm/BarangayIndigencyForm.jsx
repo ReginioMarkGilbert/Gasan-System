@@ -22,7 +22,6 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
             name: currentUser?.name || "",
             barangay: currentUser?.barangay || "",
             contactNumber: initialData?.contactNumber || "",
-            monthlyIncome: initialData?.monthlyIncome || "",
             purpose: initialData?.purpose || "",
         },
     });
@@ -42,12 +41,8 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
     }, [currentUser, setValue]);
 
     const handleFormSubmit = (data) => {
-        const formData = {
-            ...data,
-            monthlyIncome: parseFloat(data.monthlyIncome),
-        };
-        console.log("Submitting indigency form with data:", formData);
-        onSubmit(formData, "barangay-indigency");
+        console.log("Submitting indigency form with data:", data);
+        onSubmit(data, "barangay-indigency");
     };
 
     return (
@@ -85,20 +80,6 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
                     />
                     {errors.contactNumber && (
                         <p className="text-red-500 text-sm">{errors.contactNumber.message}</p>
-                    )}
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="monthlyIncome">Monthly Income</Label>
-                    <Input
-                        id="monthlyIncome"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        {...register("monthlyIncome")}
-                        placeholder="Enter your monthly income"
-                    />
-                    {errors.monthlyIncome && (
-                        <p className="text-red-500 text-sm">{errors.monthlyIncome.message}</p>
                     )}
                 </div>
                 <div className="space-y-2 md:col-span-2">
