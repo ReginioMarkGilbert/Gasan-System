@@ -24,6 +24,11 @@ const BarangayIndigencySchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    status: {
+        type: String,
+        enum: ["Pending", "Approved", "Completed", "Rejected"],
+        default: "Pending",
+    },
 });
 
 const BarangayIndigency = mongoose.model("BarangayIndigency", BarangayIndigencySchema);

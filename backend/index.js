@@ -15,6 +15,7 @@ import cedulaRoutes from "./routes/cedula.routes.js";
 import businessClearanceRoutes from "./routes/business.clearance.routes.js";
 import blotterReportRoutes from "./routes/blotter.report.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import documentRequestRoutes from "./routes/document.request.routes.js";
 
 const app = express();
 dotenv.config();
@@ -33,29 +34,38 @@ const connectDB = async () => {
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 15000, // Increase timeout to 15 seconds
-            socketTimeoutMS: 45000, // Increase socket timeout
-            maxPoolSize: 50, // Increase connection pool size
-            wtimeoutMS: 30000, // Increase write timeout
+            serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+            socketTimeoutMS: 45000,
+            maxPoolSize: 50,
         });
         console.log("Connected to MongoDB");
     } catch (error) {
         console.error("MongoDB connection error:", error);
-        process.exit(1);
+        // Don't exit process, just log error
+        console.log("Retrying connection in 5 seconds...");
+        setTimeout(connectDB, 5000);
     }
 };
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB with retry mechanism
+const connectWithRetry = () => {
+    console.log("Attempting to connect to MongoDB...");
+    connectDB();
+};
+
+// Initial connection
+connectWithRetry();
 
 // Handle MongoDB connection errors
 mongoose.connection.on("error", (err) => {
     console.error("MongoDB connection error:", err);
+    console.log("Retrying connection in 5 seconds...");
+    setTimeout(connectWithRetry, 5000);
 });
 
 mongoose.connection.on("disconnected", () => {
     console.log("MongoDB disconnected. Attempting to reconnect...");
-    connectDB();
+    setTimeout(connectWithRetry, 5000);
 });
 
 // Run server
@@ -88,5 +98,6 @@ app.use("/api/cedula", cedulaRoutes);
 app.use("/api/business-clearance", businessClearanceRoutes);
 app.use("/api/blotter", blotterReportRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/document-requests", documentRequestRoutes);
 
 export default app;
