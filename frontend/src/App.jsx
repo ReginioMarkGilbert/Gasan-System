@@ -26,7 +26,7 @@ const DashboardWrapper = () => {
         "settings",
         "requests",
         "blotter",
-        "request-admin",
+        "requestdocs",
         "incidents",
         "incident-report-admin",
         "residents",

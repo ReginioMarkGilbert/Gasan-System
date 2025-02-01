@@ -37,3 +37,39 @@ export const mockIncidentReports = [
     },
     // Add more mock data as needed
 ];
+
+export const mockDocumentRequests = [
+    {
+        id: 1,
+        type: "Barangay Clearance",
+        requestDate: "2023-06-01",
+        residentName: "John Doe",
+        purpose: "Job Application",
+        status: "Pending",
+    },
+    {
+        id: 2,
+        type: "Barangay Indigency",
+        requestDate: "2023-06-02",
+        residentName: "Jane Smith",
+        purpose: "Medical Assistance",
+        status: "Approved",
+    },
+    {
+        id: 3,
+        type: "Cedula",
+        requestDate: "2023-06-03",
+        residentName: "Bob Johnson",
+        purpose: "Business Permit",
+        status: "Completed",
+    },
+    {
+        id: 4,
+        type: "Barangay Business Clearance",
+        requestDate: "2023-06-04",
+        residentName: "Alice Brown",
+        purpose: "New Business Registration",
+        status: "Pending",
+    },
+    // Add more mock data as needed
+];
