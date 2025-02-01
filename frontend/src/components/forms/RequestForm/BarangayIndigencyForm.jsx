@@ -1,9 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { barangayIndigencySchema } from "../validationSchemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
@@ -39,6 +46,13 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
             setValue("barangay", currentUser.barangay || "");
         }
     }, [currentUser, setValue]);
+
+    const handlePurposeChange = useCallback(
+        (value) => {
+            setValue("purpose", value);
+        },
+        [setValue]
+    );
 
     const handleFormSubmit = (data) => {
         console.log("Submitting indigency form with data:", data);
@@ -82,13 +96,27 @@ export default function BarangayIndigencyForm({ onSubmit, initialData, onDataCha
                         <p className="text-red-500 text-sm">{errors.contactNumber.message}</p>
                     )}
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                     <Label htmlFor="purpose">Purpose</Label>
-                    <Input
-                        id="purpose"
-                        {...register("purpose")}
-                        placeholder="Enter purpose for indigency"
-                    />
+                    <Select onValueChange={handlePurposeChange}>
+                        <SelectTrigger id="purpose">
+                            <SelectValue placeholder="Select purpose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Financial Assistance">
+                                Financial Assistance
+                            </SelectItem>
+                            <SelectItem value="Scholarship">Scholarship</SelectItem>
+                            <SelectItem value="Medical Assistance">Medical Assistance</SelectItem>
+                            <SelectItem value="Legal Assistance">Legal Assistance</SelectItem>
+                            <SelectItem value="Employment Assistance">
+                                Employment Assistance
+                            </SelectItem>
+                            <SelectItem value="Welfare Assistance">Welfare Assistance</SelectItem>
+                            <SelectItem value="Housing Assistance">Housing Assistance</SelectItem>
+                            <SelectItem value="Tuition Assistance">Tuition Assistance</SelectItem>
+                        </SelectContent>
+                    </Select>
                     {errors.purpose && (
                         <p className="text-red-500 text-sm">{errors.purpose.message}</p>
                     )}

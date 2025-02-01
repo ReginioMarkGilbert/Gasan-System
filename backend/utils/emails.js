@@ -280,3 +280,53 @@ export const sendOTPVerificationEmail = async (user, otp, res, token) => {
         return res.status(500).json({ message: "Failed to send OTP verification email." });
     }
 };
+
+export const sendVerificationConfirmationEmail = async (user) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.AUTH_EMAIL,
+                pass: process.env.AUTH_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: {
+                name: "GASAN BMS",
+                address: process.env.AUTH_EMAIL,
+            },
+            to: user.email,
+            subject: "Account Verified - GASAN BMS",
+            html: `
+                <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+                    <div style="background-color: #166534; padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">GASAN BMS</h1>
+                    </div>
+                    <div style="padding: 20px; border: 1px solid #e5e7eb;">
+                        <h2>Account Verified Successfully!</h2>
+                        <p>Dear ${user.name},</p>
+                        <p>Your account has been successfully verified by the barangay secretary/chairman. You now have full access to all features of the Barangay Management System.</p>
+                        <div style="margin: 30px 0; text-align: center;">
+                            <a href="${process.env.CLIENT_URL}/sign-in" 
+                               style="background-color: #166534; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
+                                Login to Your Account
+                            </a>
+                        </div>
+                        <p>If you have any questions or concerns, please don't hesitate to contact your barangay office.</p>
+                        <p>Best regards,<br>GASAN BMS Team</p>
+                    </div>
+                    <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
+                        <p>This is an automated message, please do not reply.</p>
+                    </div>
+                </div>
+            `,
+        };
+
+        await transporter.verify();
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        return false;
+    }
+};

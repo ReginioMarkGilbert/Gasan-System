@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { barangayClearanceSchema } from "../validationSchemas";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
@@ -48,6 +55,13 @@ export default function BarangayClearanceForm({ onSubmit, initialData, onDataCha
         onSubmit(data, "barangay-clearance");
     };
 
+    const handlePurposeChange = useCallback(
+        (value) => {
+            setValue("purpose", value);
+        },
+        [setValue]
+    );
+
     return (
         <form id="document-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
@@ -86,11 +100,21 @@ export default function BarangayClearanceForm({ onSubmit, initialData, onDataCha
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="purpose">Purpose</Label>
-                    <Input
-                        id="purpose"
-                        {...register("purpose")}
-                        placeholder="Enter purpose for clearance"
-                    />
+                    <Select onValueChange={handlePurposeChange}>
+                        <SelectTrigger id="purpose">
+                            <SelectValue placeholder="Select purpose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Employment">Employment</SelectItem>
+                            <SelectItem value="Business">Business</SelectItem>
+                            <SelectItem value="Travel">Travel</SelectItem>
+                            <SelectItem value="Identification">Identification</SelectItem>
+                            <SelectItem value="Permit">Permit</SelectItem>
+                            <SelectItem value="Legal">Legal</SelectItem>
+                            <SelectItem value="Residency">Residency</SelectItem>
+                            <SelectItem value="Banking">Banking</SelectItem>
+                        </SelectContent>
+                    </Select>
                     {errors.purpose && (
                         <p className="text-red-500 text-sm">{errors.purpose.message}</p>
                     )}

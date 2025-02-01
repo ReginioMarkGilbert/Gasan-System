@@ -4,7 +4,21 @@ export const barangayClearanceSchema = z.object({
     name: z.string().min(1, "Full name is required"),
     email: z.string().email("Invalid email format"),
     barangay: z.string().min(1, "Barangay is required"),
-    purpose: z.string().min(1, "Purpose is required"),
+    purpose: z.enum(
+        [
+            "Employment",
+            "Business",
+            "Travel",
+            "Identification",
+            "Permit",
+            "Legal",
+            "Residency",
+            "Banking",
+        ],
+        {
+            required_error: "Purpose is required",
+        }
+    ),
     contactNumber: z.string().min(1, "Contact number is required"),
     dateOfBirth: z.string().min(1, "Date of birth is required"),
 });
@@ -13,7 +27,21 @@ export const barangayIndigencySchema = z.object({
     name: z.string().min(1, "Full name is required"),
     barangay: z.string().min(1, "Barangay is required"),
     contactNumber: z.string().min(1, "Contact number is required"),
-    purpose: z.string().min(1, "Purpose is required"),
+    purpose: z.enum(
+        [
+            "Financial Assistance",
+            "Scholarship",
+            "Medical Assistance",
+            "Legal Assistance",
+            "Employment Assistance",
+            "Welfare Assistance",
+            "Housing Assistance",
+            "Tuition Assistance",
+        ],
+        {
+            required_error: "Purpose is required",
+        }
+    ),
 });
 
 export const sedulaSchema = z.object({
