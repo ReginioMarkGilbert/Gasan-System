@@ -6,7 +6,27 @@ import Cedula from "../models/cedula.model.js";
 // Get all document requests for a barangay
 export const getAllDocumentRequests = async (req, res, next) => {
     try {
+        // Add authentication verification logging
+        console.log("Request headers:", req.headers);
+        console.log("Authenticated user:", req.user);
+
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+        }
+
         const { barangay } = req.user;
+
+        if (!barangay) {
+            return res.status(400).json({
+                success: false,
+                message: "User barangay not found"
+            });
+        }
+
+        console.log("Fetching requests for barangay:", barangay);
 
         // Fetch requests from all document types
         const [clearances, indigency, business, cedulas] = await Promise.all([
@@ -15,6 +35,13 @@ export const getAllDocumentRequests = async (req, res, next) => {
             BusinessClearance.find({ barangay }).sort({ createdAt: -1 }),
             Cedula.find({ barangay }).sort({ createdAt: -1 }),
         ]);
+
+        console.log("Found documents:", {
+            clearances: clearances.length,
+            indigency: indigency.length,
+            business: business.length,
+            cedulas: cedulas.length,
+        });
 
         // Transform and combine all requests
         const allRequests = [
@@ -71,11 +98,14 @@ export const getAllDocumentRequests = async (req, res, next) => {
             (a, b) => new Date(b.requestDate) - new Date(a.requestDate)
         );
 
+        console.log("Sending response with", sortedRequests.length, "total requests");
+
         res.status(200).json({
             success: true,
             data: sortedRequests,
         });
     } catch (error) {
+        console.error("Error in getAllDocumentRequests:", error);
         next(error);
     }
 };
