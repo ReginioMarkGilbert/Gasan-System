@@ -38,6 +38,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const LoadingOverlay = ({ message }) => (
     <div className="fixed inset-0 bg-background/50 backdrop-blur-[2px] z-50">
@@ -302,255 +303,265 @@ export function UserList() {
     }
 
     return (
-        <>
-            {isActionLoading() && <LoadingOverlay message={getLoadingMessage()} />}
-            <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <h2 className="text-2xl font-bold tracking-tight">Users</h2>
-                    <div className="w-full sm:w-[300px]">
-                        <Input
-                            placeholder="Search users..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="h-8"
-                        />
+        <Card>
+            <CardHeader>
+                <CardTitle>Users</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Input
+                                placeholder="Search users..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-[300px]"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Select
+                                value={pageSize.toString()}
+                                onValueChange={handlePageSizeChange}
+                            >
+                                <SelectTrigger className="w-[80px]">
+                                    <SelectValue placeholder={pageSize} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[5, 10, 20, 30, 40, 50].map((size) => (
+                                        <SelectItem key={size} value={size.toString()}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <span className="text-sm text-muted-foreground">per page</span>
+                        </div>
                     </div>
-                </div>
 
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead>Barangay</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Account</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {currentItems.map((user) => (
-                                <TableRow
-                                    key={user._id}
-                                    className={!user.isActive ? "opacity-60" : ""}
-                                >
-                                    <TableCell className="font-medium">{user.name}</TableCell>
-                                    <TableCell>{user.email}</TableCell>
-                                    <TableCell className="capitalize">{user.role}</TableCell>
-                                    <TableCell>{user.barangay}</TableCell>
-                                    <TableCell>
-                                        <Badge
-                                            variant={user.isVerified ? "default" : "secondary"}
-                                            className={
-                                                user.isVerified
-                                                    ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                                    : ""
-                                            }
-                                        >
-                                            {user.isVerified ? "Verified" : "Pending"}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={user.isActive ? "outline" : "destructive"}>
-                                            {user.isActive ? "Active" : "Deactivated"}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    onClick={() => handleVerifyUser(user._id)}
-                                                    disabled={
-                                                        actionLoading.verifying ||
-                                                        actionLoading.rejecting ||
-                                                        actionLoading.deactivating ||
-                                                        actionLoading.activating ||
-                                                        user.isVerified
-                                                    }
-                                                    className={
-                                                        user.isVerified
-                                                            ? "bg-green-50 text-green-800 cursor-not-allowed"
-                                                            : "text-green-600 focus:text-green-600 cursor-pointer"
-                                                    }
-                                                >
-                                                    {actionLoading.verifying &&
-                                                    actionLoading.userId === user._id ? (
-                                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-green-600" />
-                                                    ) : (
-                                                        <CheckCircle2
-                                                            className={`mr-2 h-4 w-4 ${
-                                                                user.isVerified
-                                                                    ? "text-green-800"
-                                                                    : "text-green-600"
-                                                            }`}
-                                                        />
-                                                    )}
-                                                    {actionLoading.verifying &&
-                                                    actionLoading.userId === user._id
-                                                        ? "Verifying..."
-                                                        : user.isVerified
-                                                          ? "Already Verified"
-                                                          : "Verify User"}
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => handleRejectUser(user._id)}
-                                                    disabled={
-                                                        actionLoading.verifying ||
-                                                        actionLoading.rejecting ||
-                                                        actionLoading.deactivating ||
-                                                        actionLoading.activating ||
-                                                        user.isVerified
-                                                    }
-                                                    className={
-                                                        user.isVerified
-                                                            ? "bg-red-50 text-red-800 cursor-not-allowed"
-                                                            : "text-red-600 focus:text-red-600 cursor-pointer"
-                                                    }
-                                                >
-                                                    {actionLoading.rejecting &&
-                                                    actionLoading.userId === user._id ? (
-                                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-red-600" />
-                                                    ) : (
-                                                        <XCircle
-                                                            className={`mr-2 h-4 w-4 ${
-                                                                user.isVerified
-                                                                    ? "text-red-800"
-                                                                    : "text-red-600"
-                                                            }`}
-                                                        />
-                                                    )}
-                                                    {actionLoading.rejecting &&
-                                                    actionLoading.userId === user._id
-                                                        ? "Rejecting..."
-                                                        : user.isVerified
-                                                          ? "Cannot Reject"
-                                                          : "Reject User"}
-                                                </DropdownMenuItem>
-                                                {user.role !== "admin" &&
-                                                    user.role !== "chairman" &&
-                                                    user.role !== "secretary" && (
-                                                        <>
-                                                            {user.isActive ? (
-                                                                <DropdownMenuItem
-                                                                    onClick={() =>
-                                                                        setDeactivateDialog({
-                                                                            isOpen: true,
-                                                                            userId: user._id,
-                                                                            reason: "",
-                                                                        })
-                                                                    }
-                                                                    disabled={
-                                                                        actionLoading.verifying ||
-                                                                        actionLoading.rejecting ||
-                                                                        actionLoading.deactivating ||
-                                                                        actionLoading.activating
-                                                                    }
-                                                                    className="text-red-600 focus:text-red-600 cursor-pointer border-t"
-                                                                >
-                                                                    {actionLoading.deactivating &&
-                                                                    actionLoading.userId ===
-                                                                        user._id ? (
-                                                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-red-600" />
-                                                                    ) : (
-                                                                        <UserX className="mr-2 h-4 w-4 text-red-600" />
-                                                                    )}
-                                                                    {actionLoading.deactivating &&
-                                                                    actionLoading.userId ===
-                                                                        user._id
-                                                                        ? "Deactivating..."
-                                                                        : "Deactivate User"}
-                                                                </DropdownMenuItem>
-                                                            ) : (
-                                                                <DropdownMenuItem
-                                                                    onClick={() =>
-                                                                        handleActivateUser(user._id)
-                                                                    }
-                                                                    disabled={
-                                                                        actionLoading.verifying ||
-                                                                        actionLoading.rejecting ||
-                                                                        actionLoading.deactivating ||
-                                                                        actionLoading.activating
-                                                                    }
-                                                                    className="text-green-600 focus:text-green-600 cursor-pointer border-t"
-                                                                >
-                                                                    {actionLoading.activating &&
-                                                                    actionLoading.userId ===
-                                                                        user._id ? (
-                                                                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-green-600" />
-                                                                    ) : (
-                                                                        <UserCheck className="mr-2 h-4 w-4 text-green-600" />
-                                                                    )}
-                                                                    {actionLoading.activating &&
-                                                                    actionLoading.userId ===
-                                                                        user._id
-                                                                        ? "Activating..."
-                                                                        : "Activate User"}
-                                                                </DropdownMenuItem>
-                                                            )}
-                                                        </>
-                                                    )}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Role</TableHead>
+                                    <TableHead>Barangay</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Account</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {currentItems.map((user) => (
+                                    <TableRow
+                                        key={user._id}
+                                        className={!user.isActive ? "opacity-60" : ""}
+                                    >
+                                        <TableCell className="font-medium">{user.name}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell className="capitalize">{user.role}</TableCell>
+                                        <TableCell>{user.barangay}</TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={user.isVerified ? "default" : "secondary"}
+                                                className={
+                                                    user.isVerified
+                                                        ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                                        : ""
+                                                }
+                                            >
+                                                {user.isVerified ? "Verified" : "Pending"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge
+                                                variant={user.isActive ? "outline" : "destructive"}
+                                            >
+                                                {user.isActive ? "Active" : "Deactivated"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="sm">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleVerifyUser(user._id)}
+                                                        disabled={
+                                                            actionLoading.verifying ||
+                                                            actionLoading.rejecting ||
+                                                            actionLoading.deactivating ||
+                                                            actionLoading.activating ||
+                                                            user.isVerified
+                                                        }
+                                                        className={
+                                                            user.isVerified
+                                                                ? "bg-green-50 text-green-800 cursor-not-allowed"
+                                                                : "text-green-600 focus:text-green-600 cursor-pointer"
+                                                        }
+                                                    >
+                                                        {actionLoading.verifying &&
+                                                        actionLoading.userId === user._id ? (
+                                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-green-600" />
+                                                        ) : (
+                                                            <CheckCircle2
+                                                                className={`mr-2 h-4 w-4 ${
+                                                                    user.isVerified
+                                                                        ? "text-green-800"
+                                                                        : "text-green-600"
+                                                                }`}
+                                                            />
+                                                        )}
+                                                        {actionLoading.verifying &&
+                                                        actionLoading.userId === user._id
+                                                            ? "Verifying..."
+                                                            : user.isVerified
+                                                              ? "Already Verified"
+                                                              : "Verify User"}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleRejectUser(user._id)}
+                                                        disabled={
+                                                            actionLoading.verifying ||
+                                                            actionLoading.rejecting ||
+                                                            actionLoading.deactivating ||
+                                                            actionLoading.activating ||
+                                                            user.isVerified
+                                                        }
+                                                        className={
+                                                            user.isVerified
+                                                                ? "bg-red-50 text-red-800 cursor-not-allowed"
+                                                                : "text-red-600 focus:text-red-600 cursor-pointer"
+                                                        }
+                                                    >
+                                                        {actionLoading.rejecting &&
+                                                        actionLoading.userId === user._id ? (
+                                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-red-600" />
+                                                        ) : (
+                                                            <XCircle
+                                                                className={`mr-2 h-4 w-4 ${
+                                                                    user.isVerified
+                                                                        ? "text-red-800"
+                                                                        : "text-red-600"
+                                                                }`}
+                                                            />
+                                                        )}
+                                                        {actionLoading.rejecting &&
+                                                        actionLoading.userId === user._id
+                                                            ? "Rejecting..."
+                                                            : user.isVerified
+                                                              ? "Cannot Reject"
+                                                              : "Reject User"}
+                                                    </DropdownMenuItem>
+                                                    {user.role !== "admin" &&
+                                                        user.role !== "chairman" &&
+                                                        user.role !== "secretary" && (
+                                                            <>
+                                                                {user.isActive ? (
+                                                                    <DropdownMenuItem
+                                                                        onClick={() =>
+                                                                            setDeactivateDialog({
+                                                                                isOpen: true,
+                                                                                userId: user._id,
+                                                                                reason: "",
+                                                                            })
+                                                                        }
+                                                                        disabled={
+                                                                            actionLoading.verifying ||
+                                                                            actionLoading.rejecting ||
+                                                                            actionLoading.deactivating ||
+                                                                            actionLoading.activating
+                                                                        }
+                                                                        className="text-red-600 focus:text-red-600 cursor-pointer border-t"
+                                                                    >
+                                                                        {actionLoading.deactivating &&
+                                                                        actionLoading.userId ===
+                                                                            user._id ? (
+                                                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-red-600" />
+                                                                        ) : (
+                                                                            <UserX className="mr-2 h-4 w-4 text-red-600" />
+                                                                        )}
+                                                                        {actionLoading.deactivating &&
+                                                                        actionLoading.userId ===
+                                                                            user._id
+                                                                            ? "Deactivating..."
+                                                                            : "Deactivate User"}
+                                                                    </DropdownMenuItem>
+                                                                ) : (
+                                                                    <DropdownMenuItem
+                                                                        onClick={() =>
+                                                                            handleActivateUser(
+                                                                                user._id
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            actionLoading.verifying ||
+                                                                            actionLoading.rejecting ||
+                                                                            actionLoading.deactivating ||
+                                                                            actionLoading.activating
+                                                                        }
+                                                                        className="text-green-600 focus:text-green-600 cursor-pointer border-t"
+                                                                    >
+                                                                        {actionLoading.activating &&
+                                                                        actionLoading.userId ===
+                                                                            user._id ? (
+                                                                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-green-600" />
+                                                                        ) : (
+                                                                            <UserCheck className="mr-2 h-4 w-4 text-green-600" />
+                                                                        )}
+                                                                        {actionLoading.activating &&
+                                                                        actionLoading.userId ===
+                                                                            user._id
+                                                                            ? "Activating..."
+                                                                            : "Activate User"}
+                                                                    </DropdownMenuItem>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
 
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between">
                         <p className="text-sm text-muted-foreground">
                             {searchTerm
                                 ? `${filteredUsers.length} results found`
                                 : `Total Users: ${filteredUsers.length}`}
                         </p>
-                        <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                            <SelectTrigger className="h-8 w-[70px]">
-                                <SelectValue placeholder={pageSize} />
-                            </SelectTrigger>
-                            <SelectContent side="top">
-                                {[5, 10, 20, 30, 40, 50].map((size) => (
-                                    <SelectItem key={size} value={size.toString()}>
-                                        {size}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="flex items-center space-x-6 lg:space-x-8">
-                        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                            Page {currentPage} of {totalPages}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            >
-                                Previous
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            >
-                                Next
-                            </Button>
+                        <div className="flex items-center space-x-6 lg:space-x-8">
+                            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                                Page {currentPage} of {totalPages}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </CardContent>
 
             <AlertDialog
                 open={deactivateDialog.isOpen}
@@ -594,6 +605,6 @@ export function UserList() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-        </>
+        </Card>
     );
 }
