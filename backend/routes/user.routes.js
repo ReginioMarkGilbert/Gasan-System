@@ -4,6 +4,8 @@ import {
     getUserById,
     verifyUser,
     rejectUser,
+    deactivateUser,
+    activateUser,
 } from "../controllers/user.controller.js";
 import verifyToken from "../utils/verifyToken.js";
 
@@ -22,5 +24,11 @@ router.patch("/:userId/verify", verifyToken, verifyUser);
 
 // Add this route alongside your existing routes
 router.patch("/:userId/reject", verifyToken, rejectUser);
+
+// Add this route alongside your existing routes
+router.patch("/:userId/deactivate", verifyToken, deactivateUser);
+
+// Add this route alongside your existing routes
+router.patch("/:userId/activate", verifyToken, activateUser);
 
 export default router;

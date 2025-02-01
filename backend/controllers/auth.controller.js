@@ -79,6 +79,22 @@ export const login = async (req, res, next) => {
             });
         }
 
+        // Check if user is verified and active
+        if (!user.isVerified || user.isActive === false) {
+            let message = "Account access denied. ";
+            if (!user.isVerified) {
+                message += "Your account is not yet verified. Please wait for verification.";
+            }
+            if (user.isActive === false) {
+                message +=
+                    "Your account has been deactivated. Please contact your barangay office.";
+            }
+            return res.status(403).json({
+                success: false,
+                message,
+            });
+        }
+
         const validPassword = await bcrypt.compare(password, user.password);
 
         if (!validPassword) {

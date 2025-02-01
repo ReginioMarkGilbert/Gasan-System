@@ -25,6 +25,7 @@ const incidentReportSchema = new mongoose.Schema(
         description: {
             type: String,
             required: true,
+            minlength: 10,
         },
         reporterName: {
             type: String,
@@ -34,17 +35,14 @@ const incidentReportSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        evidence: [
-            {
-                filename: String,
-                contentType: String,
-                data: Buffer,
-            },
-        ],
         status: {
             type: String,
-            enum: ["pending", "investigating", "resolved"],
-            default: "pending",
+            enum: ["New", "In Progress", "Resolved"],
+            default: "New",
+        },
+        barangay: {
+            type: String,
+            required: true,
         },
     },
     { timestamps: true }

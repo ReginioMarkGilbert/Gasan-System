@@ -62,7 +62,6 @@ export const incidentReportSchema = z.object({
     description: z.string().min(10, "Description must be at least 10 characters long"),
     reporterName: z.string().min(1, "Your name is required"),
     reporterContact: z.string().min(1, "Contact information is required"),
-    evidence: z.instanceof(FileList).optional(),
 });
 
 export const cedulaSchema = z.object({
