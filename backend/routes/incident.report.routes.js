@@ -1,23 +1,32 @@
 import express from "express";
 import {
     createIncidentReport,
+    getAllIncidentReports,
     updateIncidentStatus,
+    getIncidentReport,
+    deleteIncidentReport,
     getEvidence,
 } from "../controllers/incident.report.controller.js";
-import verifyToken from "../utils/verifyToken.js";
+import { verifyToken } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
-// Create an incident report
-// POST /api/incident-report/submit
-router.post("/submit", verifyToken, createIncidentReport);
+// Get all incident reports
+router.get("/", verifyToken, getAllIncidentReports);
 
-// Update incident status
-// PATCH /api/incident-report/status/:id
-router.patch("/status/:id", verifyToken, updateIncidentStatus);
+// Get single incident report
+router.get("/:id", verifyToken, getIncidentReport);
 
-// Get evidence file
-// GET /api/incident-report/:id/evidence/:fileIndex
+// Create incident report
+router.post("/", verifyToken, createIncidentReport);
+
+// Update incident report status
+router.patch("/:id/status", verifyToken, updateIncidentStatus);
+
+// Delete incident report
+router.delete("/:id", verifyToken, deleteIncidentReport);
+
+// Add route for getting evidence
 router.get("/:id/evidence/:fileIndex", verifyToken, getEvidence);
 
 export default router;

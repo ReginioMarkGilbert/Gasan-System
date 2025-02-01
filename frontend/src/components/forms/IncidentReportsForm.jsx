@@ -87,31 +87,17 @@ export default function IncidentReportForm() {
         try {
             setIsSubmitting(true);
 
-            // Convert files to base64
-            const evidenceFiles = [];
-            if (data.evidence?.length) {
-                for (const file of data.evidence) {
-                    const base64Data = await convertFileToBase64(file);
-                    evidenceFiles.push({
-                        filename: file.name,
-                        contentType: file.type,
-                        data: base64Data,
-                    });
-                }
-            }
-
-            // Create request body
             const requestBody = {
                 ...data,
-                evidence: evidenceFiles,
+                barangay: currentUser.barangay,
             };
 
             const response = await axios.post(
-                "http://localhost:5000/api/incident-report/submit",
+                "http://localhost:5000/api/incident-report",
                 requestBody,
                 {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${currentUser.token}`,
                         "Content-Type": "application/json",
                     },
                 }
@@ -131,19 +117,6 @@ export default function IncidentReportForm() {
         } finally {
             setIsSubmitting(false);
         }
-    };
-
-    // Helper function to convert file to base64
-    const convertFileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                const base64String = reader.result.split(",")[1];
-                resolve(base64String);
-            };
-            reader.onerror = (error) => reject(error);
-        });
     };
 
     return (
@@ -259,19 +232,6 @@ export default function IncidentReportForm() {
                                 <p className="text-red-500 text-sm">
                                     {errors.reporterContact.message}
                                 </p>
-                            )}
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
-                            <Label htmlFor="evidence">Upload Evidence (optional)</Label>
-                            <Input
-                                id="evidence"
-                                type="file"
-                                multiple
-                                {...register("evidence")}
-                                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
-                            />
-                            {errors.evidence && (
-                                <p className="text-red-500 text-sm">{errors.evidence.message}</p>
                             )}
                         </div>
                     </div>
