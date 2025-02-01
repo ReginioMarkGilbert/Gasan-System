@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
     Table,
     TableBody,
@@ -39,6 +40,11 @@ export function DocumentRequestSecretary() {
     const { currentUser } = useSelector((state) => state.user);
     const API_URL = import.meta.env.VITE_API_URL;
 
+    // Add pagination and search states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [searchTerm, setSearchTerm] = useState("");
+
     const fetchRequests = async () => {
         try {
             const res = await axios.get(`${API_URL}/document-requests`, {
@@ -54,7 +60,7 @@ export function DocumentRequestSecretary() {
             console.error("Error fetching requests:", error);
             toast.error(
                 error.response?.data?.message ||
-                    "Failed to fetch requests. Please check if the server is running."
+                "Failed to fetch requests. Please check if the server is running."
             );
         } finally {
             setLoading(false);
@@ -185,6 +191,29 @@ export function DocumentRequestSecretary() {
         }
     };
 
+    // Filter requests based on search term
+    const filteredRequests = requests.filter((request) =>
+        Object.values(request).join(" ").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Calculate pagination
+    const totalRequests = filteredRequests.length;
+    const totalPages = Math.ceil(totalRequests / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const currentRequests = filteredRequests.slice(startIndex, endIndex);
+
+    // Handle page size change
+    const handlePageSizeChange = (value) => {
+        setPageSize(Number(value));
+        setCurrentPage(1); // Reset to first page when changing page size
+    };
+
+    // Handle page change
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full">
@@ -202,164 +231,229 @@ export function DocumentRequestSecretary() {
                 <CardTitle>Recent Document Requests</CardTitle>
             </CardHeader>
             <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Resident</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Action</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {requests.map((request) => (
-                            <TableRow key={request.id}>
-                                <TableCell>
-                                    {request.requestDate
-                                        ? new Date(request.requestDate).toLocaleDateString()
-                                        : "N/A"}
-                                </TableCell>
-                                <TableCell>{request.type}</TableCell>
-                                <TableCell>{request.residentName}</TableCell>
-                                <TableCell>
-                                    <Badge className={getStatusColor(request.status)}>
-                                        {request.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => setSelectedRequest(request)}
-                                            >
-                                                View Details
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Document Request Details</DialogTitle>
-                                            </DialogHeader>
-                                            {selectedRequest && (
-                                                <div className="grid gap-4">
-                                                    <div className="space-y-4">
-                                                        <div className="grid gap-2">
-                                                            <div className="flex items-center justify-between">
+                <div className="space-y-4">
+                    {/* Search and Page Size Controls */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Input
+                                placeholder="Search requests..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-[300px]"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Select
+                                value={pageSize.toString()}
+                                onValueChange={handlePageSizeChange}
+                            >
+                                <SelectTrigger className="w-[80px]">
+                                    <SelectValue placeholder={pageSize} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[5, 10, 20, 30, 40, 50].map((size) => (
+                                        <SelectItem key={size} value={size.toString()}>
+                                            {size}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <span className="text-sm text-muted-foreground">per page</span>
+                        </div>
+                    </div>
+
+                    {/* Table */}
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Resident</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {currentRequests.map((request) => (
+                                <TableRow key={request.id}>
+                                    <TableCell>
+                                        {request.requestDate
+                                            ? new Date(request.requestDate).toLocaleDateString()
+                                            : "N/A"}
+                                    </TableCell>
+                                    <TableCell>{request.type}</TableCell>
+                                    <TableCell>{request.residentName}</TableCell>
+                                    <TableCell>
+                                        <Badge className={getStatusColor(request.status)}>
+                                            {request.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => setSelectedRequest(request)}
+                                                >
+                                                    View Details
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>Document Request Details</DialogTitle>
+                                                </DialogHeader>
+                                                {selectedRequest && (
+                                                    <div className="grid gap-4">
+                                                        <div className="space-y-4">
+                                                            <div className="grid gap-2">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <p className="text-sm font-medium leading-none">
+                                                                            Request Date
+                                                                        </p>
+                                                                        <p className="text-sm text-muted-foreground">
+                                                                            {new Date(
+                                                                                selectedRequest.requestDate
+                                                                            ).toLocaleDateString()}
+                                                                        </p>
+                                                                    </div>
+                                                                    <Badge
+                                                                        className={getStatusColor(
+                                                                            selectedRequest.status
+                                                                        )}
+                                                                    >
+                                                                        {selectedRequest.status}
+                                                                    </Badge>
+                                                                </div>
+                                                            </div>
+                                                            <div className="grid gap-2">
                                                                 <div className="flex flex-col gap-1">
                                                                     <p className="text-sm font-medium leading-none">
-                                                                        Request Date
+                                                                        Document Type
                                                                     </p>
                                                                     <p className="text-sm text-muted-foreground">
-                                                                        {new Date(
-                                                                            selectedRequest.requestDate
-                                                                        ).toLocaleDateString()}
+                                                                        {selectedRequest.type}
                                                                     </p>
                                                                 </div>
-                                                                <Badge
-                                                                    className={getStatusColor(
-                                                                        selectedRequest.status
-                                                                    )}
-                                                                >
-                                                                    {selectedRequest.status}
-                                                                </Badge>
                                                             </div>
+                                                            {getDocumentDetails(selectedRequest).map(
+                                                                (detail, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className="grid gap-2"
+                                                                    >
+                                                                        <div className="flex flex-col gap-1">
+                                                                            <p className="text-sm font-medium leading-none">
+                                                                                {detail.label}
+                                                                            </p>
+                                                                            <p className="text-sm text-muted-foreground">
+                                                                                {detail.value || "N/A"}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            )}
                                                         </div>
+
                                                         <div className="grid gap-2">
                                                             <div className="flex flex-col gap-1">
                                                                 <p className="text-sm font-medium leading-none">
-                                                                    Document Type
+                                                                    Update Status
                                                                 </p>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {selectedRequest.type}
-                                                                </p>
+                                                                <Select
+                                                                    onValueChange={(value) =>
+                                                                        handleStatusChange(
+                                                                            selectedRequest.id,
+                                                                            selectedRequest.type,
+                                                                            value
+                                                                        )
+                                                                    }
+                                                                    defaultValue={
+                                                                        selectedRequest.status
+                                                                    }
+                                                                    disabled={
+                                                                        updating ||
+                                                                        selectedRequest.status ===
+                                                                        "Completed" ||
+                                                                        selectedRequest.status ===
+                                                                        "Rejected"
+                                                                    }
+                                                                >
+                                                                    <SelectTrigger>
+                                                                        <SelectValue>
+                                                                            {selectedRequest.status}
+                                                                        </SelectValue>
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {getAvailableStatuses(
+                                                                            selectedRequest.status
+                                                                        ).map((status) => (
+                                                                            <SelectItem
+                                                                                key={status}
+                                                                                value={status}
+                                                                                className={
+                                                                                    status ===
+                                                                                        "Rejected"
+                                                                                        ? "text-destructive"
+                                                                                        : status ===
+                                                                                            "Completed"
+                                                                                            ? "text-primary"
+                                                                                            : status ===
+                                                                                                "Approved"
+                                                                                                ? "text-green-500"
+                                                                                                : ""
+                                                                                }
+                                                                            >
+                                                                                {status}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
                                                             </div>
                                                         </div>
-                                                        {getDocumentDetails(selectedRequest).map(
-                                                            (detail, index) => (
-                                                                <div
-                                                                    key={index}
-                                                                    className="grid gap-2"
-                                                                >
-                                                                    <div className="flex flex-col gap-1">
-                                                                        <p className="text-sm font-medium leading-none">
-                                                                            {detail.label}
-                                                                        </p>
-                                                                        <p className="text-sm text-muted-foreground">
-                                                                            {detail.value || "N/A"}
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            )
-                                                        )}
                                                     </div>
+                                                )}
+                                            </DialogContent>
+                                        </Dialog>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
 
-                                                    <div className="grid gap-2">
-                                                        <div className="flex flex-col gap-1">
-                                                            <p className="text-sm font-medium leading-none">
-                                                                Update Status
-                                                            </p>
-                                                            <Select
-                                                                onValueChange={(value) =>
-                                                                    handleStatusChange(
-                                                                        selectedRequest.id,
-                                                                        selectedRequest.type,
-                                                                        value
-                                                                    )
-                                                                }
-                                                                defaultValue={
-                                                                    selectedRequest.status
-                                                                }
-                                                                disabled={
-                                                                    updating ||
-                                                                    selectedRequest.status ===
-                                                                        "Completed" ||
-                                                                    selectedRequest.status ===
-                                                                        "Rejected"
-                                                                }
-                                                            >
-                                                                <SelectTrigger>
-                                                                    <SelectValue>
-                                                                        {selectedRequest.status}
-                                                                    </SelectValue>
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    {getAvailableStatuses(
-                                                                        selectedRequest.status
-                                                                    ).map((status) => (
-                                                                        <SelectItem
-                                                                            key={status}
-                                                                            value={status}
-                                                                            className={
-                                                                                status ===
-                                                                                "Rejected"
-                                                                                    ? "text-destructive"
-                                                                                    : status ===
-                                                                                        "Completed"
-                                                                                      ? "text-primary"
-                                                                                      : status ===
-                                                                                          "Approved"
-                                                                                        ? "text-green-500"
-                                                                                        : ""
-                                                                            }
-                                                                        >
-                                                                            {status}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </DialogContent>
-                                    </Dialog>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                    {/* Pagination Controls */}
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm text-muted-foreground">
+                            {searchTerm
+                                ? `${filteredRequests.length} results found`
+                                : `Total Requests: ${totalRequests}`}
+                        </p>
+                        <div className="flex items-center space-x-6 lg:space-x-8">
+                            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                                Page {currentPage} of {totalPages}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Previous
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     );
