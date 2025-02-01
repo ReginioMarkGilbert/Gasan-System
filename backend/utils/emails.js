@@ -330,3 +330,98 @@ export const sendVerificationConfirmationEmail = async (user) => {
         return false;
     }
 };
+
+export const sendDeactivationEmail = async (user, reason) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.AUTH_EMAIL,
+                pass: process.env.AUTH_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: {
+                name: "GASAN BMS",
+                address: process.env.AUTH_EMAIL,
+            },
+            to: user.email,
+            subject: "Account Deactivated - GASAN BMS",
+            html: `
+                <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+                    <div style="background-color: #991b1b; padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">GASAN BMS</h1>
+                    </div>
+                    <div style="padding: 20px; border: 1px solid #e5e7eb;">
+                        <h2>Account Deactivated</h2>
+                        <p>Dear ${user.name},</p>
+                        <p>Your account has been deactivated by the barangay administrator.</p>
+                        <p><strong>Reason for deactivation:</strong></p>
+                        <p style="padding: 10px; background-color: #fee2e2; border-radius: 4px;">${reason}</p>
+                        <p>If you believe this is a mistake or would like to reactivate your account, please contact your barangay office.</p>
+                        <p>Best regards,<br>GASAN BMS Team</p>
+                    </div>
+                    <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
+                        <p>This is an automated message, please do not reply.</p>
+                    </div>
+                </div>
+            `,
+        };
+
+        await transporter.verify();
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const sendActivationEmail = async (user) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.AUTH_EMAIL,
+                pass: process.env.AUTH_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: {
+                name: "GASAN BMS",
+                address: process.env.AUTH_EMAIL,
+            },
+            to: user.email,
+            subject: "Account Activated - GASAN BMS",
+            html: `
+                <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+                    <div style="background-color: #166534; padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0;">GASAN BMS</h1>
+                    </div>
+                    <div style="padding: 20px; border: 1px solid #e5e7eb;">
+                        <h2>Account Activated Successfully!</h2>
+                        <p>Dear ${user.name},</p>
+                        <p>Your account has been reactivated by the barangay administrator. You can now log in to your account.</p>
+                        <div style="margin: 30px 0; text-align: center;">
+                            <a href="${process.env.CLIENT_URL}/sign-in" 
+                               style="background-color: #166534; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">
+                                Login to Your Account
+                            </a>
+                        </div>
+                        <p>Best regards,<br>GASAN BMS Team</p>
+                    </div>
+                    <div style="background-color: #f3f4f6; padding: 20px; text-align: center; font-size: 12px; color: #6b7280;">
+                        <p>This is an automated message, please do not reply.</p>
+                    </div>
+                </div>
+            `,
+        };
+
+        await transporter.verify();
+        await transporter.sendMail(mailOptions);
+        return true;
+    } catch (error) {
+        return false;
+    }
+};

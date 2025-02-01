@@ -1,5 +1,9 @@
 import User from "../models/user.model.js";
-import { sendVerificationConfirmationEmail } from "../utils/emails.js";
+import {
+    sendVerificationConfirmationEmail,
+    sendDeactivationEmail,
+    sendActivationEmail,
+} from "../utils/emails.js";
 
 export const getUsersByBarangay = async (req, res, next) => {
     try {
@@ -13,7 +17,7 @@ export const getUsersByBarangay = async (req, res, next) => {
             });
         }
 
-        // Find users from the same barangay
+        // Find users from the same barangay, including inactive ones
         const users = await User.find({
             barangay,
             // Exclude admin users from results
@@ -156,6 +160,129 @@ export const rejectUser = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: "User rejected successfully",
+            data: user,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Add this new controller method
+export const deactivateUser = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const { reason } = req.body; // Get reason from request body
+        const { role, barangay } = req.user;
+
+        if (!reason) {
+            return res.status(400).json({
+                success: false,
+                message: "Deactivation reason is required",
+            });
+        }
+
+        // Check if user has permission
+        if (role !== "secretary" && role !== "chairman") {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Not authorized.",
+            });
+        }
+
+        const user = await User.findOne({
+            _id: userId,
+            barangay,
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Don't allow deactivation of admin/chairman/secretary accounts
+        if (user.role === "admin" || user.role === "chairman" || user.role === "secretary") {
+            return res.status(403).json({
+                success: false,
+                message: "Cannot deactivate admin or staff accounts",
+            });
+        }
+
+        // Set user as inactive
+        user.isActive = false;
+        await user.save();
+
+        // Send deactivation email
+        try {
+            const emailSent = await sendDeactivationEmail(user, reason);
+            if (!emailSent) {
+                console.log("Failed to send deactivation email");
+            }
+        } catch (emailError) {
+            console.log("Error sending deactivation email:", emailError);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User deactivated successfully",
+            data: user,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const activateUser = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        const { role, barangay } = req.user;
+
+        // Check if user has permission
+        if (role !== "secretary" && role !== "chairman") {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Not authorized.",
+            });
+        }
+
+        const user = await User.findOne({
+            _id: userId,
+            barangay,
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Don't allow activation of admin/chairman/secretary accounts
+        if (user.role === "admin" || user.role === "chairman" || user.role === "secretary") {
+            return res.status(403).json({
+                success: false,
+                message: "Cannot modify admin or staff accounts",
+            });
+        }
+
+        // Set user as active
+        user.isActive = true;
+        await user.save();
+
+        // Send activation email
+        try {
+            const emailSent = await sendActivationEmail(user);
+            if (!emailSent) {
+                console.log("Failed to send activation email");
+            }
+        } catch (emailError) {
+            console.log("Error sending activation email:", emailError);
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "User activated successfully",
             data: user,
         });
     } catch (error) {
