@@ -14,6 +14,7 @@ import incidentReportRoutes from "./routes/incident.report.routes.js";
 import cedulaRoutes from "./routes/cedula.routes.js";
 import businessClearanceRoutes from "./routes/business.clearance.routes.js";
 import blotterReportRoutes from "./routes/blotter.report.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const app = express();
 dotenv.config();
@@ -86,5 +87,6 @@ app.use("/api/incident-report", incidentReportRoutes);
 app.use("/api/cedula", cedulaRoutes);
 app.use("/api/business-clearance", businessClearanceRoutes);
 app.use("/api/blotter", blotterReportRoutes);
+app.use("/api/users", userRoutes);
 
 export default app;
