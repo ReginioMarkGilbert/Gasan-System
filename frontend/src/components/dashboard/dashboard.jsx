@@ -18,29 +18,31 @@ import {
     SidebarMenuItem,
     SidebarProvider,
 } from "@/components/ui/sidebar";
-import { cn, getUserFromLocalStorage } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import BlotterReportPage from "@/pages/BlotterReportPage";
 import IncidentReportsPage from "@/pages/IncidentReportsPage";
 import { logout } from "@/redux/user/userSlice";
 import axios from "axios";
 import { FileText, LayoutDashboard, LogOut, Mail, Settings, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Header } from "./Header";
 import Overview from "./Overview";
 import { UserList } from "./UserList";
+import IncidentReportSecretaryPage from "@/pages/incident-report.jsx";
 
 const componentMap = {
     overview: Overview,
     users: UserList,
-    home: Overview, // Map 'home' tab to Overview component
-    // settings: Settings,
-    // help: Help,
+    home: Overview,
     requests: Requests,
     reports: IncidentReportsPage,
     blotter: BlotterReportPage,
+    incidents: IncidentReportSecretaryPage,
+    // settings: Settings,
+    // help: Help,
 };
 
 function Dashboard({ tab }) {
@@ -117,7 +119,7 @@ function Dashboard({ tab }) {
                   {
                       icon: FileText,
                       label: "Incident Report",
-                      href: "/dashboard?tab=incident-report-admin",
+                      href: "/dashboard?tab=incidents",
                   },
                   {
                       icon: Users,
