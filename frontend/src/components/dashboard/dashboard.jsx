@@ -32,6 +32,7 @@ import { Header } from "./Header";
 import Overview from "./Overview";
 import { UserList } from "./UserList";
 import IncidentReportSecretaryPage from "@/pages/incident-report.jsx";
+import { DocumentRequestSecretary } from "./secretary/DocumentRequestSecretary";
 
 const componentMap = {
     overview: Overview,
@@ -41,6 +42,7 @@ const componentMap = {
     reports: IncidentReportsPage,
     blotter: BlotterReportPage,
     incidents: IncidentReportSecretaryPage,
+    requestdocs: DocumentRequestSecretary,
     // settings: Settings,
     // help: Help,
 };
@@ -114,7 +116,7 @@ function Dashboard({ tab }) {
                   {
                       icon: Mail,
                       label: "Request",
-                      href: "/dashboard?tab=request-admin",
+                      href: "/dashboard?tab=requestdocs",
                   },
                   {
                       icon: FileText,
